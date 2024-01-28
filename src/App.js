@@ -45,20 +45,18 @@ export default class App extends Component {
     const group = groups[newGroupOrder];
 
     const startTime = new Date(dragTime);
-  
-    startTime.setHours(0, 0 ,0)
-    startTime.setDate(1)
 
-    console.log('log - time: ', startTime)
+    startTime.setHours(0, 0, 0)
+    startTime.setDate(1)
 
     this.setState({
       items: items.map(item =>
         item.id === itemId
           ? Object.assign({}, item, {
-              start: startTime.getTime(),
-              end: startTime.getTime() + (item.end - item.start),
-              group: group.id
-            })
+            start: startTime.getTime(),
+            end: startTime.getTime() + (item.end - item.start),
+            group: group.id
+          })
           : item
       )
     });
@@ -73,18 +71,16 @@ export default class App extends Component {
       items: items.map(item =>
         item.id === itemId
           ? Object.assign({}, item, {
-              start: edge === "left" ? time : item.start,
-              end: edge === "left" ? item.end : time
-            })
+            start: edge === "left" ? time : item.start,
+            end: edge === "left" ? item.end : time
+          })
           : item
       )
     });
-
-    console.log("Resized", itemId, time, edge);
   };
 
   onTimeChange = (start, end, fn) => {
-    fn(start, start + 12 * 30 * 24 * 60 * 60* 1000)
+    fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000)
   }
 
   onCanvasClick = (itemId, time, edge) => {
@@ -105,6 +101,37 @@ export default class App extends Component {
     })
   }
 
+  swapElements = (array, index1, index2) => {
+    array[index1] = array.splice(index2, 1, array[index1])[0];
+  };
+
+  onDragStart = (id) => (e) => {
+    e
+      .dataTransfer
+      .setData('text/plain', id);
+  }
+
+  onDragEnter = (e) => {
+    e.preventDefault()
+    return true
+  }
+
+  onDrop = (id) => (e) => {
+    // console.log('log - drop:', id, e.dataTransfer.getData('text/plain'))
+    // console.log(this.state.groups)
+
+    const groups = [...this.state.groups]
+
+    const index = groups.findIndex((group) => group.id === id)
+    const index2 = groups.findIndex((group) => group.id === e.dataTransfer.getData('text/plain'))
+
+    this.swapElements(groups, index, index2)
+
+    this.setState({ ...this.state, groups })
+
+    console.log('log - groups', this.state.groups)
+  }
+
   render() {
     const { groups, items, defaultTimeStart, defaultTimeEnd } = this.state;
 
@@ -115,6 +142,14 @@ export default class App extends Component {
         defaultTimeStart={new Date('2024-01-01')}
         defaultTimeEnd={new Date('2025-01-01')}
         traditionalZoom={false}
+        groupRenderer={({ group }) => {
+          return (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }} onDrop={this.onDrop(group.id)} onDragOver={this.onDragEnter}>
+              <span>{group.title}</span>
+              <span draggable style={{ cursor: 'move' }} onDragStart={this.onDragStart(group.id)}>move</span>
+            </div>
+          );
+        }}
         // minResizeWidth={1000}
         // clickTolerance={100}
         groups={groups}
