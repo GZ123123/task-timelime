@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 
-import { _get, arraysEqual } from '../utility/generic'
+import { _get, arraysEqual } from "../utility/generic";
 
 export default class Sidebar extends Component {
   static propTypes = {
@@ -13,11 +13,9 @@ export default class Sidebar extends Component {
     keys: PropTypes.object.isRequired,
     groupRenderer: PropTypes.func,
     isRightSidebar: PropTypes.bool,
-  }
+  };
 
   shouldComponentUpdate(nextProps) {
-    console.log(nextProps);
-
     return !(
       nextProps.mode === this.props.keys &&
       nextProps.keys === this.props.keys &&
@@ -25,47 +23,37 @@ export default class Sidebar extends Component {
       nextProps.height === this.props.height &&
       arraysEqual(nextProps.groups, this.props.groups) &&
       arraysEqual(nextProps.groupHeights, this.props.groupHeights)
-    )
+    );
   }
 
   renderGroupContent(group, isRightSidebar, groupTitleKey, groupRightTitleKey) {
     if (this.props.groupRenderer) {
       return React.createElement(this.props.groupRenderer, {
+        mode: this.props.mode,
         group,
-        isRightSidebar
-      })
+        isRightSidebar,
+      });
     } else {
-      return _get(group, isRightSidebar ? groupRightTitleKey : groupTitleKey)
+      return _get(group, isRightSidebar ? groupRightTitleKey : groupTitleKey);
     }
   }
 
   render() {
-    const { width, groupHeights, height, isRightSidebar } = this.props
+    const { width, groupHeights, height, isRightSidebar } = this.props;
 
-    const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys
-
-    const sidebarStyle = {
-      width: `${width}px`,
-      height: `${height}px`
-    }
-
-    const groupsStyle = {
-      width: `${width}px`
-    }
+    const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys;
 
     let groupLines = this.props.groups.map((group, index) => {
-      const elementStyle = {
-        height: `${groupHeights[index]}px`,
-        lineHeight: `${groupHeights[index]}px`
-      }
-
       return (
         <div
           key={_get(group, groupIdKey)}
-          className={
-            'rct-sidebar-row rct-sidebar-row-' + (index % 2 === 0 ? 'even' : 'odd')
-          }
-          style={elementStyle}
+          className={`rct-sidebar-row rct-sidebar-row-${
+            index % 2 ? "even" : "old"
+          }`}
+          style={{
+            height: `${groupHeights[index]}px`,
+            lineHeight: `${groupHeights[index]}px`,
+          }}
         >
           {this.renderGroupContent(
             group,
@@ -74,16 +62,16 @@ export default class Sidebar extends Component {
             groupRightTitleKey
           )}
         </div>
-      )
-    })
+      );
+    });
 
     return (
       <div
-        className={'rct-sidebar' + (isRightSidebar ? ' rct-sidebar-right' : '')}
-        style={sidebarStyle}
+        className={"rct-sidebar" + (isRightSidebar ? " rct-sidebar-right" : "")}
+        style={{ width: `${width}px`, height: `${height}px` }}
       >
-        <div style={groupsStyle}>{groupLines}</div>
+        <div style={{ width: `${width}px` }}>{groupLines}</div>
       </div>
-    )
+    );
   }
 }

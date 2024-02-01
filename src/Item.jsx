@@ -1,4 +1,5 @@
 import types from "prop-types";
+import { GROUP_TYPES } from "./constants";
 
 export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
@@ -10,7 +11,7 @@ export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
 
   const { style, ...props } = getItemProps({  });
   
-  if(item.type) {
+  if(item.type === GROUP_TYPES.START || item.type === GROUP_TYPES.END) {
     return (
       <div
         {...props}

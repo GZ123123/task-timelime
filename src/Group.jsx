@@ -1,10 +1,11 @@
 import types from "prop-types";
 import { useRef, useState } from "react";
 
-export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
+import { GROUP_TYPES, MODES } from "./constants";
+
+export function Group({ isDragging, mode, group, onSwapGroup, onChange }) {
   const parentRef = useRef();
 
-  const [isDragging, setDragging] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(group.title);
 
@@ -13,13 +14,10 @@ export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
   };
 
   const onHandleMouseUp = () => {
-    setDragging(false);
-
     parentRef.current.setAttribute("draggable", "false");
   };
 
   const onDragStart = () => {
-    setDragging(true);
     event.dataTransfer.setData("id", group.id);
   };
 
@@ -58,17 +56,13 @@ export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
   };
 
   const onEdit = () => {
-    console.log("onEdit");
-
-    setSelected(group.id);
+    // setSelected(group.id);
 
     setIsEdit(true);
   };
 
   const onSave = () => {
-    console.log("onSave");
-
-    setSelected(null);
+    // setSelected(null);
 
     setIsEdit(false);
 
@@ -79,14 +73,18 @@ export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
     setEditTitle(e.target.value);
   };
 
-  console.log('log - mode:', mode)
-
-  if (mode === "edit") {
+  if (mode === MODES.VIEW || group.type === GROUP_TYPES.START) {
     return (
       <div className="group-item" ref={parentRef}>
-        <div style={{ flex: 1 }} onClick={onEdit}>
-          <span>{group.title}</span>
-        </div>
+        <div style={{ flex: 1 }}>{group.title}</div>
+      </div>
+    );
+  }
+
+  if (group.type === GROUP_TYPES.ADD_BUTTON) {
+    return (
+      <div className="group-item rct-react-add-process">
+        <div style={{ flex: 1 }}>工程を追加</div>
       </div>
     );
   }
@@ -146,7 +144,7 @@ export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
           }}
         >
           <div style={{ flex: 1 }} onClick={onEdit}>
-            <span>{group.title}</span>
+            {group.title}
           </div>
           <svg
             className="drag-handler"
@@ -177,6 +175,7 @@ export function Group({ mode, group, setSelected, onSwapGroup, onChange }) {
 
 Group.propTypes = {
   mode: types.string,
+  isDragging: types.bool,
   setSelected: types.func,
   group: types.any,
   onSwapGroup: types.func,

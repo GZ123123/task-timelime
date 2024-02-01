@@ -7,6 +7,7 @@ import { Item } from "./Item";
 import { root } from "./main";
 import { Header } from "./Header";
 import { Group } from "./Group";
+import { GROUP_TYPES, MODES } from "./constants";
 
 const KEYS = {
   groupIdKey: "id",
@@ -21,13 +22,29 @@ const KEYS = {
   groupLabelKey: "title",
 };
 
+const CONFIGS = {
+  traditionalZoom: false,
+  itemHeightRatio: 0.75,
+  itemTouchSendsClick: false,
+  canMove: false,
+  canResize: false,
+  lineHeight: 56,
+  canChangeGroup: false,
+  fullUpdate: true,
+  useResizeHandle: false,
+  stackItems: true,
+};
+
 export function App() {
-  const [items, setItems] = useState(JSON.parse(root.dataset.items ?? "[]"));
-  const [groups, setGroups] = useState(JSON.parse(root.dataset.groups ?? "[]"));
+  const [items, setItems] = useState(JSON.parse(root.dataset["items"] ?? "[]"));
+  const [groups, setGroups] = useState(
+    JSON.parse(root.dataset["groups"] ?? "[]")
+  );
+  const [isEdit, setEdit] = useState(
+    JSON.parse(root.dataset["isEdit"] ?? "false")
+  );
 
-  const [, setSelected] = useState(0)
-
-  const [mode, setMode] = useState('view')
+  // const [, setSelected] = useState(0);
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const group = groupList[newGroupOrder];
@@ -50,11 +67,13 @@ export function App() {
   };
 
   const handleItemResize = (itemId, time, edge) => {
-    const _items = items.map((item) =>{
+    const _items = items.map((item) => {
       const start = edge === "left" ? time : item.start;
       const end = edge === "left" ? item.end : time;
 
-      return item.id === itemId ? Object.assign({}, item, { start, end }) : item
+      return item.id === itemId
+        ? Object.assign({}, item, { start, end })
+        : item;
     });
 
     const event = new CustomEvent("modify:items", { detail: _items });
@@ -87,59 +106,29 @@ export function App() {
     const event = new CustomEvent("modify:groups", { detail: groups });
 
     root.dispatchEvent(event);
-  } 
+  };
 
   const onChange = (v) => {
     const index = groups.findIndex((group) => group.id === v.id);
-    groups[index].title = v.title
-    
+    groups[index].title = v.title;
+
     const event = new CustomEvent("modify:groups", { detail: groups });
 
     root.dispatchEvent(event);
-  } 
-
-  const onChangeMode = () => {
-    setMode(mode === 'edit' ? 'view': 'edit')
-  }
+  };
 
   const groupList = useMemo(() => {
-    return [
-      { id: "-1", title: "Start" },
-      ...groups,
-      { id: "-2", title: "End" },
-    ];
-  }, [groups]);
+    if (isEdit) {
+      return [
+        ...groups,
+        { id: "add-button", title: "工程を追加", type: GROUP_TYPES.ADD_BUTTON },
+      ];
+    }
+    return groups;
+  }, [groups, isEdit]);
 
   const itemList = useMemo(() => {
-    return [
-      ...items,
-      {
-        id: "1",
-        group: "-1",
-        title: "masker",
-        type: 2,
-        start: 1706310000000,
-        end: 1706310000000,
-        className: "item-weekend",
-        itemProps: {
-          "data-tip":
-            "Try to transmit the COM interface, maybe it will generate the solid state sensor!",
-        },
-      },
-      {
-        id: "3",
-        group: "-2",
-        title: "masker",
-        type: 2,
-        start: 1720575339222,
-        end: 1720575339222,
-        className: "item-weekend",
-        itemProps: {
-          "data-tip":
-            "Try to transmit the COM interface, maybe it will generate the solid state sensor!",
-        },
-      },
-    ];
+    return [...items];
   }, [items]);
 
   useEffect(() => {
@@ -153,41 +142,39 @@ export function App() {
       root.removeEventListener("sync:items", onChangeItems);
       root.removeEventListener("sync:groups", onChangeGroups);
     };
-  });
+  }, []);
+
+  useEffect(() => {
+    const onClick = () => setEdit(!isEdit);
+    document.querySelector("#editMode").addEventListener("click", onClick);
+
+    return () => {
+      document.querySelector("#editMode").removeEventListener("click", onClick);
+    };
+  }, [isEdit]);
 
   return (
-    <>
     <Timeline
-      mode={mode}
+      mode={isEdit ? MODES.EDIT : MODES.VIEW}
       defaultTimeStart={new Date("2024-01-01")}
       defaultTimeEnd={new Date("2025-01-01")}
-      traditionalZoom={false}
-      itemHeightRatio={0.75}
       groups={groupList}
       items={itemList}
       keys={KEYS}
-      fullUpdate
-      useResizeHandle
-      itemTouchSendsClick={false}
-      stackItems
-      canMove={false}
-      canResize={false}
+      {...CONFIGS}
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
       onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
-      lineHeight={50}
       onCanvasDoubleClick={onCanvasClick}
-      canChangeGroup={false}
-
       itemRenderer={Item}
-      groupRenderer={({ group }) => <Group mode={mode} group={group} onSwapGroup={onSwapGroup} setSelected={setSelected} onChange={onChange}/>}
+      groupRenderer={(props) => (
+        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} />
+      )}
     >
       <TimelineHeaders className="sticky">
         <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
       </TimelineHeaders>
     </Timeline>
-    <button onClick={onChangeMode}> changeMode - {mode}</button>
-    </>
   );
 }

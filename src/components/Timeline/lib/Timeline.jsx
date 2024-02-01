@@ -126,7 +126,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   static defaultProps = {
-    sidebarWidth: 150,
+    sidebarWidth: 100,
     rightSidebarWidth: 0,
     dragSnap: 1000 * 60 * 15, // 15min
     minResizeWidth: 20,
@@ -393,7 +393,7 @@ export default class ReactCalendarTimeline extends Component {
     return derivedState
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     const newZoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
     const oldZoom = prevState.visibleTimeEnd - prevState.visibleTimeStart
 
@@ -773,12 +773,12 @@ export default class ReactCalendarTimeline extends Component {
 
   items(
     canvasTimeStart,
-    zoom,
+    _zoom,
     canvasTimeEnd,
     canvasWidth,
-    minUnit,
+    _minUnit,
     dimensionItems,
-    groupHeights,
+    _groupHeights,
     groupTops
   ) {
     return (
@@ -836,22 +836,22 @@ export default class ReactCalendarTimeline extends Component {
     )
   }
 
-  rightSidebar(height, groupHeights) {
-    const { rightSidebarWidth } = this.props
-    return (
-      rightSidebarWidth && (
-        <Sidebar
-          groups={this.props.groups}
-          keys={this.props.keys}
-          groupRenderer={this.props.groupRenderer}
-          isRightSidebar
-          width={rightSidebarWidth}
-          groupHeights={groupHeights}
-          height={height}
-        />
-      )
-    )
-  }
+  // rightSidebar(height, groupHeights) {
+  //   const { rightSidebarWidth } = this.props
+  //   return (
+  //     rightSidebarWidth && (
+  //       <Sidebar
+  //         groups={this.props.groups}
+  //         keys={this.props.keys}
+  //         groupRenderer={this.props.groupRenderer}
+  //         isRightSidebar
+  //         width={rightSidebarWidth}
+  //         groupHeights={groupHeights}
+  //         height={height}
+  //       />
+  //     )
+  //   )
+  // }
 
   /**
    * check if child of type TimelineHeader
@@ -957,7 +957,6 @@ export default class ReactCalendarTimeline extends Component {
       items,
       groups,
       sidebarWidth,
-      rightSidebarWidth,
       timeSteps,
       traditionalZoom,
       buffer,
@@ -1078,9 +1077,9 @@ export default class ReactCalendarTimeline extends Component {
                     )}
                   </MarkerCanvas>
                 </ScrollElement>
-                {rightSidebarWidth > 0
+                {/* {rightSidebarWidth > 0
                   ? this.rightSidebar(height, groupHeights)
-                  : null}
+                  : null} */}
               </div>
             </div>
           </TimelineHeadersProvider>
