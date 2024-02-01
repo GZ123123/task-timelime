@@ -1,11 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-import Timeline, {
-  TimelineHeaders,
-  DateHeader
-}  from "react-calendar-timeline";
+import Timeline, { TimelineHeaders, DateHeader } from "./components/Timeline";
 
-import { Item } from './Item';
+import { Item } from "./Item";
 
 import { root } from "./main";
 import { Header } from "./Header";
@@ -25,11 +22,15 @@ const KEYS = {
 };
 
 export function App() {
-  const [items, setItems] = useState(JSON.parse(root.dataset.items));
-  const [groups, setGroups] = useState(JSON.parse(root.dataset.groups));
+  const [items, setItems] = useState(JSON.parse(root.dataset.items ?? "[]"));
+  const [groups, setGroups] = useState(JSON.parse(root.dataset.groups ?? "[]"));
+
+  const [, setSelected] = useState(0)
+
+  const [mode, setMode] = useState('view')
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
-    const group = groups[newGroupOrder];
+    const group = groupList[newGroupOrder];
 
     const startTime = new Date(dragTime);
 
@@ -49,14 +50,12 @@ export function App() {
   };
 
   const handleItemResize = (itemId, time, edge) => {
-    const _items = items.map((item) =>
-      item.id === itemId
-        ? Object.assign({}, item, {
-            start: edge === "left" ? time : item.start,
-            end: edge === "left" ? item.end : time,
-          })
-        : item
-    );
+    const _items = items.map((item) =>{
+      const start = edge === "left" ? time : item.start;
+      const end = edge === "left" ? item.end : time;
+
+      return item.id === itemId ? Object.assign({}, item, { start, end }) : item
+    });
 
     const event = new CustomEvent("modify:items", { detail: _items });
 
@@ -64,41 +63,84 @@ export function App() {
   };
 
   const onTimeChange = (start, end, fn) => {
-    console.log('onTimeChange')
     fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000);
   };
 
   const onCanvasClick = (group, time) => {
-    const event = new CustomEvent("add:items", {
-      detail: { group, time },
-    });
+    const event = new CustomEvent("add:items", { detail: { group, time } });
 
     root.dispatchEvent(event);
   };
 
-  // const onDragStart = (id) => (e) => {
-  //   e.dataTransfer.setData("id", id);
-  // };
+  const onItemDoubleClick = (e) => {
+    const event = new CustomEvent("edit:items", { detail: e });
 
-  // const onDragEnter = (e) => {
-  //   e.preventDefault();
-  //   return true;
-  // };
+    root.dispatchEvent(event);
+  };
 
-  // const onDrop = (id) => (e) => {
-  //   const _groups = [...groups];
+  const onSwapGroup = (source, target) => {
+    const sourceIndex = groups.findIndex((group) => group.id === source);
+    const targetIndex = groups.findIndex((group) => group.id === target);
 
-  //   const transferId = e.dataTransfer.getData("id");
+    groups[sourceIndex] = groups.splice(targetIndex, 1, groups[sourceIndex])[0];
 
-  //   const index1 = _groups.findIndex((group) => group.id === id);
-  //   const index2 = _groups.findIndex((group) => group.id === transferId);
+    const event = new CustomEvent("modify:groups", { detail: groups });
 
-  //   _groups[index1] = _groups.splice(index2, 1, _groups[index1])[0];
+    root.dispatchEvent(event);
+  } 
 
-  //   const event = new CustomEvent("modify:groups", { detail: _groups });
+  const onChange = (v) => {
+    const index = groups.findIndex((group) => group.id === v.id);
+    groups[index].title = v.title
+    
+    const event = new CustomEvent("modify:groups", { detail: groups });
 
-  //   root.dispatchEvent(event);
-  // };
+    root.dispatchEvent(event);
+  } 
+
+  const onChangeMode = () => {
+    setMode(mode === 'edit' ? 'view': 'edit')
+  }
+
+  const groupList = useMemo(() => {
+    return [
+      { id: "-1", title: "Start" },
+      ...groups,
+      { id: "-2", title: "End" },
+    ];
+  }, [groups]);
+
+  const itemList = useMemo(() => {
+    return [
+      ...items,
+      {
+        id: "1",
+        group: "-1",
+        title: "masker",
+        type: 2,
+        start: 1706310000000,
+        end: 1706310000000,
+        className: "item-weekend",
+        itemProps: {
+          "data-tip":
+            "Try to transmit the COM interface, maybe it will generate the solid state sensor!",
+        },
+      },
+      {
+        id: "3",
+        group: "-2",
+        title: "masker",
+        type: 2,
+        start: 1720575339222,
+        end: 1720575339222,
+        className: "item-weekend",
+        itemProps: {
+          "data-tip":
+            "Try to transmit the COM interface, maybe it will generate the solid state sensor!",
+        },
+      },
+    ];
+  }, [items]);
 
   useEffect(() => {
     const onChangeItems = () => setItems(JSON.parse(root.dataset.items));
@@ -114,38 +156,38 @@ export function App() {
   });
 
   return (
+    <>
     <Timeline
+      mode={mode}
       defaultTimeStart={new Date("2024-01-01")}
       defaultTimeEnd={new Date("2025-01-01")}
       traditionalZoom={false}
-      groupRenderer={Group}
       itemHeightRatio={0.75}
-      groups={groups}
-      items={items}
+      groups={groupList}
+      items={itemList}
       keys={KEYS}
       fullUpdate
       useResizeHandle
       itemTouchSendsClick={false}
       stackItems
-      canMove={true}
-      canResize={"both"}
+      canMove={false}
+      canResize={false}
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
       onTimeChange={onTimeChange}
+      onItemDoubleClick={onItemDoubleClick}
       lineHeight={50}
       onCanvasDoubleClick={onCanvasClick}
       canChangeGroup={false}
+
       itemRenderer={Item}
+      groupRenderer={({ group }) => <Group mode={mode} group={group} onSwapGroup={onSwapGroup} setSelected={setSelected} onChange={onChange}/>}
     >
       <TimelineHeaders className="sticky">
-          {/* <SidebarHeader>
-            {({ getRootProps }) => {
-              return <div {...getRootProps()}>Left</div>;
-            }}
-          </SidebarHeader> */}
-          {/* <DateHeader unit="primaryHeader" /> */}
-          <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
-        </TimelineHeaders>
+        <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
+      </TimelineHeaders>
     </Timeline>
+    <button onClick={onChangeMode}> changeMode - {mode}</button>
+    </>
   );
 }
