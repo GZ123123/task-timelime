@@ -1,5 +1,5 @@
 import types from "prop-types";
-import { GROUP_TYPES } from "./constants";
+import { GROUP_TYPES } from "../../constants";
 
 export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();

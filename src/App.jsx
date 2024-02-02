@@ -2,11 +2,11 @@ import { useState, useEffect, useMemo } from "react";
 
 import Timeline, { TimelineHeaders, DateHeader } from "./components/Timeline";
 
-import { Item } from "./Item";
+import { Item } from "./components/Custom/Item";
 
 import { root } from "./main";
-import { Header } from "./Header";
-import { Group } from "./Group";
+import { Header } from "./components/Custom/Header";
+import { Group } from "./components/Custom/Group";
 import { GROUP_TYPES, MODES } from "./constants";
 
 const KEYS = {
@@ -35,16 +35,18 @@ const CONFIGS = {
   stackItems: true,
 };
 
+const emit = (name, value) => {
+  const event = new CustomEvent(name, { detail: value });
+
+  root.dispatchEvent(event);
+}
+
 export function App() {
   const [items, setItems] = useState(JSON.parse(root.dataset["items"] ?? "[]"));
   const [groups, setGroups] = useState(
     JSON.parse(root.dataset["groups"] ?? "[]")
   );
-  const [isEdit, setEdit] = useState(
-    JSON.parse(root.dataset["isEdit"] ?? "false")
-  );
-
-  // const [, setSelected] = useState(0);
+  const [mode, setMode] = useState(JSON.parse(root.dataset["mode"] ?? '"edit"'));
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const group = groupList[newGroupOrder];
@@ -61,40 +63,26 @@ export function App() {
         : item
     );
 
-    const event = new CustomEvent("modify:items", { detail: _items });
-
-    root.dispatchEvent(event);
+    emit("modify:items", _items)
   };
 
-  const handleItemResize = (itemId, time, edge) => {
-    const _items = items.map((item) => {
-      const start = edge === "left" ? time : item.start;
-      const end = edge === "left" ? item.end : time;
+  // const handleItemResize = (itemId, time, edge) => {
+  //   const _items = items.map((item) => {
+  //     const start = edge === "left" ? time : item.start;
+  //     const end = edge === "left" ? item.end : time;
 
-      return item.id === itemId
-        ? Object.assign({}, item, { start, end })
-        : item;
-    });
+  //     return item.id === itemId
+  //       ? Object.assign({}, item, { start, end })
+  //       : item;
+  //   });
 
-    const event = new CustomEvent("modify:items", { detail: _items });
+  //   emit("modify:items", _items)
+  // };
 
-    root.dispatchEvent(event);
-  };
-
-  const onTimeChange = (start, end, fn) => {
-    fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000);
-  };
-
-  const onCanvasClick = (group, time) => {
-    const event = new CustomEvent("add:items", { detail: { group, time } });
-
-    root.dispatchEvent(event);
-  };
+  const onTimeChange = (start, end, fn) => fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000)
 
   const onItemDoubleClick = (e) => {
-    const event = new CustomEvent("edit:items", { detail: e });
-
-    root.dispatchEvent(event);
+    emit("select:item", e)
   };
 
   const onSwapGroup = (source, target) => {
@@ -103,29 +91,32 @@ export function App() {
 
     groups[sourceIndex] = groups.splice(targetIndex, 1, groups[sourceIndex])[0];
 
-    const event = new CustomEvent("modify:groups", { detail: groups });
-
-    root.dispatchEvent(event);
+    emit("edit:items", groups)
   };
 
   const onChange = (v) => {
     const index = groups.findIndex((group) => group.id === v.id);
     groups[index].title = v.title;
 
-    const event = new CustomEvent("modify:groups", { detail: groups });
-
-    root.dispatchEvent(event);
+    emit("edit:items", groups)
   };
 
+  const onCreateItem = (group, time) => {
+    emit("create:item", { group, time })
+  }
+
+  const onCreateGroup = () => {
+    emit("create:group", null)
+  }
+
   const groupList = useMemo(() => {
-    if (isEdit) {
-      return [
-        ...groups,
-        { id: "add-button", title: "工程を追加", type: GROUP_TYPES.ADD_BUTTON },
-      ];
-    }
-    return groups;
-  }, [groups, isEdit]);
+    if (mode !== MODES.EDIT) return groups;
+
+    return [
+      ...groups,
+      { id: "create-button", title: "工程を追加", type: GROUP_TYPES.ADD_BUTTON },
+    ];
+  }, [groups, mode]);
 
   const itemList = useMemo(() => {
     return [...items];
@@ -134,28 +125,22 @@ export function App() {
   useEffect(() => {
     const onChangeItems = () => setItems(JSON.parse(root.dataset.items));
     const onChangeGroups = () => setGroups(JSON.parse(root.dataset.groups));
+    const onChangeMode = () => setMode(JSON.parse(root.dataset.mode));
 
     root.addEventListener("sync:items", onChangeItems);
     root.addEventListener("sync:groups", onChangeGroups);
+    root.addEventListener("sync:mode", onChangeMode);
 
     return () => {
       root.removeEventListener("sync:items", onChangeItems);
       root.removeEventListener("sync:groups", onChangeGroups);
+      root.removeEventListener("sync:mode", onChangeMode);
     };
   }, []);
 
-  useEffect(() => {
-    const onClick = () => setEdit(!isEdit);
-    document.querySelector("#editMode").addEventListener("click", onClick);
-
-    return () => {
-      document.querySelector("#editMode").removeEventListener("click", onClick);
-    };
-  }, [isEdit]);
-
   return (
     <Timeline
-      mode={isEdit ? MODES.EDIT : MODES.VIEW}
+      mode={mode}
       defaultTimeStart={new Date("2024-01-01")}
       defaultTimeEnd={new Date("2025-01-01")}
       groups={groupList}
@@ -163,13 +148,13 @@ export function App() {
       keys={KEYS}
       {...CONFIGS}
       onItemMove={handleItemMove}
-      onItemResize={handleItemResize}
+      // onItemResize={handleItemResize}
       onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
-      onCanvasDoubleClick={onCanvasClick}
+      onCanvasDoubleClick={onCreateItem}
       itemRenderer={Item}
       groupRenderer={(props) => (
-        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} />
+        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup}/>
       )}
     >
       <TimelineHeaders className="sticky">

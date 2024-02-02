@@ -1,9 +1,9 @@
 import types from "prop-types";
 import { useRef, useState } from "react";
 
-import { GROUP_TYPES, MODES } from "./constants";
+import { GROUP_TYPES, MODES } from "../../constants";
 
-export function Group({ isDragging, mode, group, onSwapGroup, onChange }) {
+export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreateGroup }) {
   const parentRef = useRef();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -56,14 +56,10 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange }) {
   };
 
   const onEdit = () => {
-    // setSelected(group.id);
-
     setIsEdit(true);
   };
 
   const onSave = () => {
-    // setSelected(null);
-
     setIsEdit(false);
 
     onChange({ ...group, title: editTitle });
@@ -83,7 +79,7 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange }) {
 
   if (group.type === GROUP_TYPES.ADD_BUTTON) {
     return (
-      <div className="group-item rct-react-add-process">
+      <div className="group-item create-process" onClick={onCreateGroup}>
         <div style={{ flex: 1 }}>工程を追加</div>
       </div>
     );
@@ -179,5 +175,6 @@ Group.propTypes = {
   setSelected: types.func,
   group: types.any,
   onSwapGroup: types.func,
+  onCreateGroup: types.func,
   onChange: types.func,
 };
