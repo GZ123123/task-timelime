@@ -34,7 +34,7 @@ export default class ReactCalendarTimeline extends Component {
 
     fakeItem: PropTypes.any,
     setFakeItem: PropTypes.func.isRequired,
-    
+
     sidebarWidth: PropTypes.number,
     rightSidebarWidth: PropTypes.number,
     dragSnap: PropTypes.number,
@@ -509,29 +509,6 @@ export default class ReactCalendarTimeline extends Component {
     );
   };
 
-  handleWheelZoom = (speed, xPosition, deltaY) => {
-    this.changeZoom(1.0 + (speed * deltaY) / 500, xPosition / this.state.width);
-  };
-
-  changeZoom = (scale, offset = 0.5) => {
-    const { minZoom, maxZoom } = this.props;
-    const oldZoom = this.state.visibleTimeEnd - this.state.visibleTimeStart;
-    const newZoom = Math.min(
-      Math.max(Math.round(oldZoom * scale), minZoom),
-      maxZoom
-    ); // min 1 min, max 20 years
-    const newVisibleTimeStart = Math.round(
-      this.state.visibleTimeStart + (oldZoom - newZoom) * offset
-    );
-
-    this.props.onTimeChange(
-      newVisibleTimeStart,
-      newVisibleTimeStart + newZoom,
-      this.updateScrollCanvas,
-      this.getTimelineUnit()
-    );
-  };
-
   showPeriod = (from, to) => {
     let visibleTimeStart = from.valueOf();
     let visibleTimeEnd = to.valueOf();
@@ -574,13 +551,6 @@ export default class ReactCalendarTimeline extends Component {
     if (this.props.onItemDoubleClick) {
       const time = this.timeFromItemEvent(e);
       this.props.onItemDoubleClick(item, e, time);
-    }
-  };
-
-  contextMenuClickItem = (item, e) => {
-    if (this.props.onItemContextMenu) {
-      const time = this.timeFromItemEvent(e);
-      this.props.onItemContextMenu(item, e, time);
     }
   };
 
@@ -651,18 +621,14 @@ export default class ReactCalendarTimeline extends Component {
     }
   };
 
-  resizingItem = (item, resizeTime, edge) => {
-    this.setState({
-      resizingItem: item,
-      resizingEdge: edge,
-      resizeTime: resizeTime,
-    });
+  resizingItem = (resizingItem, resizeTime, resizingEdge) => {
+    this.setState({ resizingItem, resizingEdge, resizeTime });
 
     this.updatingItem({
       eventType: "resize",
-      itemId: item,
+      itemId: resizingItem,
       time: resizeTime,
-      edge,
+      edge: resizingEdge,
     });
   };
 
@@ -674,9 +640,7 @@ export default class ReactCalendarTimeline extends Component {
   };
 
   updatingItem = ({ eventType, itemId, time, edge, newGroupOrder }) => {
-    // console.log('log - Timeline - updatingItem: ', {eventType, itemId, time, edge, newGroupOrder })
     if (this.props.onItemDrag) {
-      // console.log('log - Timeline - updatingItem 2: ', {eventType, itemId, time, edge, newGroupOrder })
       this.props.onItemDrag({ eventType, itemId, time, edge, newGroupOrder });
     }
   };
@@ -774,6 +738,12 @@ export default class ReactCalendarTimeline extends Component {
     _groupHeights,
     groupTops
   ) {
+    const items = this.props.items;
+
+    if (this.state.fakeItem) {
+      items.push(this.state.fakeItem);
+    }
+
     return (
       <Items
         canvasTimeStart={canvasTimeStart}
@@ -781,7 +751,8 @@ export default class ReactCalendarTimeline extends Component {
         canvasWidth={canvasWidth}
         dimensionItems={dimensionItems}
         groupTops={groupTops}
-        items={this.props.items}
+        // items={this.props.items}
+        items={items}
         groups={this.props.groups}
         keys={this.props.keys}
         selectedItem={this.state.selectedItem}
@@ -797,9 +768,6 @@ export default class ReactCalendarTimeline extends Component {
         itemDrag={this.dragItem}
         itemDrop={this.dropItem}
         onItemDoubleClick={this.doubleClickItem}
-        onItemContextMenu={
-          this.props.onItemContextMenu ? this.contextMenuClickItem : undefined
-        }
         itemResizing={this.resizingItem}
         itemResized={this.resizedItem}
         itemRenderer={this.props.itemRenderer}
@@ -830,23 +798,6 @@ export default class ReactCalendarTimeline extends Component {
       )
     );
   }
-
-  // rightSidebar(height, groupHeights) {
-  //   const { rightSidebarWidth } = this.props
-  //   return (
-  //     rightSidebarWidth && (
-  //       <Sidebar
-  //         groups={this.props.groups}
-  //         keys={this.props.keys}
-  //         groupRenderer={this.props.groupRenderer}
-  //         isRightSidebar
-  //         width={rightSidebarWidth}
-  //         groupHeights={groupHeights}
-  //         height={height}
-  //       />
-  //     )
-  //   )
-  // }
 
   /**
    * check if child of type TimelineHeader
@@ -945,34 +896,21 @@ export default class ReactCalendarTimeline extends Component {
     this.props.scrollRef(el);
     this.scrollComponent = el;
   };
-  onCreateItem = (group, timeStart) => {
-    const item = {
-      id: Date.now(),
-      group: group.id,
-      title: "masker",
-      start: timeStart,
-      end: timeStart,
-    };
 
-    this.props.setFakeItem(item)
+  onCreateItem = (group, time) => {
+    const item = { id: Date.now(), group: group.id, start: time, end: time };
+
+    // this.fakeItem = item;
+    this.props.setFakeItem(item);
 
     return item;
   };
   onItemResizing = (item, resizeTime) => {
-    console.log({
-      ...this.props.fakeItem,
-      end: resizeTime
-    })
-
-    if(resizeTime < this.props.fakeItem?.start || 0) {
-      return
-    } 
-
     this.props.setFakeItem({
       ...this.props.fakeItem,
-      end: resizeTime
-    })
-  }
+      end: resizeTime,
+    });
+  };
 
   render() {
     const {
@@ -1045,6 +983,9 @@ export default class ReactCalendarTimeline extends Component {
             rightSidebarWidth={this.props.rightSidebarWidth}
           >
             <ScrollElementProvider
+              scrollRef={this.scrollComponent}
+              buffer={buffer}
+              dragSnap={dragSnap}
               onCreateItem={this.onCreateItem}
               onResizing={this.onItemResizing}
             >
@@ -1060,15 +1001,8 @@ export default class ReactCalendarTimeline extends Component {
                     : null}
                   <ScrollElement
                     scrollRef={this.getScrollElementRef}
-                    dragSnap={dragSnap}
-                    buffer={buffer}
                     width={width}
                     height={height}
-                    canvasWidth={canvasWidth}
-                    canvasTimeStart={canvasTimeStart}
-                    canvasTimeEnd={canvasTimeEnd}
-                    onZoom={this.changeZoom}
-                    onWheelZoom={this.handleWheelZoom}
                     traditionalZoom={traditionalZoom}
                     onScroll={this.onScroll}
                     isInteractingWithItem={isInteractingWithItem}

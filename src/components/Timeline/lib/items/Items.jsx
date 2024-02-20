@@ -1,22 +1,22 @@
-import PropTypes from 'prop-types'
-import { Component } from 'react'
-import Item from './Item'
+import PropTypes from "prop-types";
+import { Component } from "react";
+import Item from "./Item";
 // import ItemGroup from './ItemGroup'
 
-import { _get, arraysEqual, keyBy } from '../utility/generic'
-import { getGroupOrders, getVisibleItems } from '../utility/calendar'
+import { _get, arraysEqual, keyBy } from "../utility/generic";
+import { getGroupOrders, getVisibleItems } from "../utility/calendar";
 
 const canResizeLeft = (item, canResize) => {
   const value =
-    _get(item, 'canResize') !== undefined ? _get(item, 'canResize') : canResize
-  return value === 'left' || value === 'both'
-}
+    _get(item, "canResize") !== undefined ? _get(item, "canResize") : canResize;
+  return value === "left" || value === "both";
+};
 
 const canResizeRight = (item, canResize) => {
   const value =
-    _get(item, 'canResize') !== undefined ? _get(item, 'canResize') : canResize
-  return value === 'right' || value === 'both' || value === true
-}
+    _get(item, "canResize") !== undefined ? _get(item, "canResize") : canResize;
+  return value === "right" || value === "both" || value === true;
+};
 
 export default class Items extends Component {
   static propTypes = {
@@ -33,7 +33,7 @@ export default class Items extends Component {
 
     canChangeGroup: PropTypes.bool.isRequired,
     canMove: PropTypes.bool.isRequired,
-    canResize: PropTypes.oneOf([true, false, 'left', 'right', 'both']),
+    canResize: PropTypes.oneOf([true, false, "left", "right", "both"]),
     canSelect: PropTypes.bool,
 
     keys: PropTypes.object.isRequired,
@@ -54,12 +54,12 @@ export default class Items extends Component {
     dimensionItems: PropTypes.array,
     groupTops: PropTypes.array,
     useResizeHandle: PropTypes.bool,
-    scrollRef: PropTypes.object
-  }
+    scrollRef: PropTypes.object,
+  };
 
   static defaultProps = {
-    selected: []
-  }
+    selected: [],
+  };
 
   shouldComponentUpdate(nextProps) {
     return !(
@@ -77,48 +77,43 @@ export default class Items extends Component {
       nextProps.canChangeGroup === this.props.canChangeGroup &&
       nextProps.canMove === this.props.canMove &&
       nextProps.canResize === this.props.canResize &&
-      nextProps.canSelect === this.props.canSelect     
-    )
+      nextProps.canSelect === this.props.canSelect
+    );
   }
 
   isSelected(item, itemIdKey) {
     if (!this.props.selected) {
-      return this.props.selectedItem === _get(item, itemIdKey)
+      return this.props.selectedItem === _get(item, itemIdKey);
     } else {
-      let target = _get(item, itemIdKey)
-      return this.props.selected.includes(target)
+      let target = _get(item, itemIdKey);
+      return this.props.selected.includes(target);
     }
   }
 
   getVisibleItems(canvasTimeStart, canvasTimeEnd) {
-    const { keys, items } = this.props
+    const { keys, items } = this.props;
 
-    return getVisibleItems(items, canvasTimeStart, canvasTimeEnd, keys)
+    return getVisibleItems(items, canvasTimeStart, canvasTimeEnd, keys);
   }
 
   render() {
-    const {
-      canvasTimeStart,
-      canvasTimeEnd,
-      dimensionItems,
-      keys,
-      groups
-    } = this.props
-    const { itemIdKey, itemGroupKey } = keys
+    const { canvasTimeStart, canvasTimeEnd, dimensionItems, keys, groups } =
+      this.props;
+    const { itemIdKey, itemGroupKey } = keys;
 
-    const groupOrders = getGroupOrders(groups, keys)
+    const groupOrders = getGroupOrders(groups, keys);
     const visibleItems = this.getVisibleItems(
       canvasTimeStart,
       canvasTimeEnd,
       groupOrders
-    )
-    const sortedDimensionItems = keyBy(dimensionItems, 'id')
+    );
+    const sortedDimensionItems = keyBy(dimensionItems, "id");
 
     return (
       <div className="rct-items">
         {visibleItems
-          .filter(item => sortedDimensionItems[_get(item, itemIdKey)])
-          .map(item => (
+          .filter((item) => sortedDimensionItems[_get(item, itemIdKey)])
+          .map((item) => (
             <Item
               key={_get(item, itemIdKey)}
               item={item}
@@ -129,20 +124,20 @@ export default class Items extends Component {
               }
               selected={this.isSelected(item, itemIdKey)}
               canChangeGroup={
-                _get(item, 'canChangeGroup') !== undefined
-                  ? _get(item, 'canChangeGroup')
+                _get(item, "canChangeGroup") !== undefined
+                  ? _get(item, "canChangeGroup")
                   : this.props.canChangeGroup
               }
               canMove={
-                _get(item, 'canMove') !== undefined
-                  ? _get(item, 'canMove')
+                _get(item, "canMove") !== undefined
+                  ? _get(item, "canMove")
                   : this.props.canMove
               }
               canResizeLeft={canResizeLeft(item, this.props.canResize)}
               canResizeRight={canResizeRight(item, this.props.canResize)}
               canSelect={
-                _get(item, 'canSelect') !== undefined
-                  ? _get(item, 'canSelect')
+                _get(item, "canSelect") !== undefined
+                  ? _get(item, "canSelect")
                   : this.props.canSelect
               }
               useResizeHandle={this.props.useResizeHandle}
@@ -165,6 +160,6 @@ export default class Items extends Component {
             />
           ))}
       </div>
-    )
+    );
   }
 }
