@@ -26,8 +26,8 @@ const CONFIGS = {
   traditionalZoom: false,
   itemHeightRatio: 0.75,
   itemTouchSendsClick: false,
-  canMove: false,
-  canResize: false,
+  canMove: true,
+  canResize: true,
   lineHeight: 56,
   canChangeGroup: false,
   fullUpdate: true,
@@ -43,6 +43,9 @@ const emit = (name, value) => {
 
 export function App() {
   const [items, setItems] = useState(JSON.parse(root.dataset["items"] ?? "[]"));
+
+  const [fakeItem, setFakeItem] = useState(null)
+
   const [groups, setGroups] = useState(
     JSON.parse(root.dataset["groups"] ?? "[]")
   );
@@ -66,18 +69,18 @@ export function App() {
     emit("modify:items", _items)
   };
 
-  // const handleItemResize = (itemId, time, edge) => {
-  //   const _items = items.map((item) => {
-  //     const start = edge === "left" ? time : item.start;
-  //     const end = edge === "left" ? item.end : time;
+  const handleItemResize = (itemId, time, edge) => {
+    const _items = items.map((item) => {
+      const start = edge === "left" ? time : item.start;
+      const end = edge === "left" ? item.end : time;
 
-  //     return item.id === itemId
-  //       ? Object.assign({}, item, { start, end })
-  //       : item;
-  //   });
+      return item.id === itemId
+        ? Object.assign({}, item, { start, end })
+        : item;
+    });
 
-  //   emit("modify:items", _items)
-  // };
+    emit("modify:items", _items)
+  };
 
   const onTimeChange = (start, end, fn) => fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000)
 
@@ -119,8 +122,11 @@ export function App() {
   }, [groups, mode]);
 
   const itemList = useMemo(() => {
+    if(fakeItem) {
+      return [...items, fakeItem]
+    }
     return [...items];
-  }, [items]);
+  }, [items, fakeItem]);
 
   useEffect(() => {
     const onChangeItems = () => setItems(JSON.parse(root.dataset.items));
@@ -145,13 +151,17 @@ export function App() {
       defaultTimeEnd={new Date("2025-01-01")}
       groups={groupList}
       items={itemList}
+      fakeItem={fakeItem}
+      setFakeItem={setFakeItem}
       keys={KEYS}
       {...CONFIGS}
+      
       onItemMove={handleItemMove}
-      // onItemResize={handleItemResize}
+      onItemResize={handleItemResize}
       onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
       onCanvasDoubleClick={onCreateItem}
+      
       itemRenderer={Item}
       groupRenderer={(props) => (
         <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup}/>

@@ -32,7 +32,7 @@ class GroupRow extends Component {
     }
 
     return (
-      <PreventClickOnDrag clickTolerance={clickTolerance} onClick={onClick}>
+      <PreventClickOnDrag clickTolerance={clickTolerance} onClick={onClick} group={group}>
         <div
           onContextMenu={onContextMenu}
           onDoubleClick={onDoubleClick}

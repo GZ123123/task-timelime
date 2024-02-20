@@ -1,40 +1,52 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { ScrollElementConsumer } from "../scroll/ScrollElementContext";
 
 class PreventClickOnDrag extends Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
+    selectGroup: PropTypes.func.isRequired,
+    group: PropTypes.any.isRequired,
     onClick: PropTypes.func.isRequired,
-    clickTolerance: PropTypes.number.isRequired
-  }
+    clickTolerance: PropTypes.number.isRequired,
+  };
 
-  handleMouseDown = evt => {
-    this.originClickX = evt.clientX
-  }
+  handleMouseDown = (evt) => {
+    this.props.selectGroup(this.props.group)
+    this.originClickX = evt.clientX;
+  };
 
-  handleMouseUp = evt => {
+  handleMouseUp = (evt) => {
     if (Math.abs(this.originClickX - evt.clientX) > this.props.clickTolerance) {
-      this.cancelClick = true
+      this.cancelClick = true;
     }
-  }
+  };
 
-  handleClick = evt => {
+  handleClick = (evt) => {
     if (!this.cancelClick) {
-      this.props.onClick(evt)
+      this.props.onClick(evt);
     }
 
-    this.cancelClick = false
-    this.originClickX = null
-  }
+    this.cancelClick = false;
+    this.originClickX = null;
+  };
 
   render() {
-    const childElement = React.Children.only(this.props.children)
+    const childElement = React.Children.only(this.props.children);
     return React.cloneElement(childElement, {
       onMouseDown: this.handleMouseDown,
       onMouseUp: this.handleMouseUp,
-      onClick: this.handleClick
-    })
+      onClick: this.handleClick,
+    });
   }
 }
 
-export default PreventClickOnDrag
+const PreventClickOnDragWrapper = (props) => (
+  <ScrollElementConsumer>
+    {({ selectGroup }) => (
+      <PreventClickOnDrag selectGroup={selectGroup} {...props} />
+    )}
+  </ScrollElementConsumer>
+);
+
+export default PreventClickOnDragWrapper;

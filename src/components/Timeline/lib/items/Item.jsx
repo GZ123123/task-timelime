@@ -343,6 +343,8 @@ export default class Item extends Component {
             )
           }
 
+          // console.log('log - Item - resizemove - resizeTime: ', resizeTime, resizeEdge)
+
           if (this.props.onResizing) {
             this.props.onResizing(this.itemId, resizeTime, resizeEdge)
           }
@@ -491,6 +493,7 @@ export default class Item extends Component {
 
   handleDoubleClick = e => {
     e.stopPropagation()
+    console.log('log - item - handleDoubleClick - e: ', e)
     if (this.props.onItemDoubleClick) {
       this.props.onItemDoubleClick(this.itemId, e)
     }
