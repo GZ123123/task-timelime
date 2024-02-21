@@ -3,7 +3,9 @@ import { useRef, useState } from "react";
 
 import { GROUP_TYPES, MODES } from "../../constants";
 
-export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreateGroup }) {
+let dragging = null
+
+export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup }) {
   const parentRef = useRef();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -18,19 +20,33 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
   };
 
   const onDragStart = () => {
-    event.dataTransfer.setData("id", group.id);
+    parentRef.current.querySelector(".title").style.pointerEvents = "none";
+
+    parentRef.current.querySelector(".drag-handler").style.pointerEvents =
+      "none";
+
+    event.dataTransfer.setData("text/plain", group.id);
+    dragging = group.id
   };
 
-  const onDragEnter = (event) => {
-    const transferId = event.dataTransfer.getData("id");
+  const onDragEnter = () => {
+    parentRef.current.querySelector(".title").style.pointerEvents = "none";
 
-    if (transferId === group.id) return;
+    parentRef.current.querySelector(".drag-handler").style.pointerEvents =
+      "none";
+
+    if (dragging === group.id) return;
 
     parentRef.current.parentNode.style.borderBottom = `2px solid black`;
   };
 
   const onDragLeave = (event) => {
-    const transferId = event.dataTransfer.getData("id");
+    const transferId = event.dataTransfer.getData("text");
+
+    parentRef.current.querySelector(".title").style.pointerEvents = "all";
+
+    parentRef.current.querySelector(".drag-handler").style.pointerEvents =
+      "all";
 
     if (transferId === group.id) return;
 
@@ -39,6 +55,7 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
 
   const onDragOver = (event) => {
     event.preventDefault();
+    event.stopPropagation();
     return true;
   };
 
@@ -46,7 +63,8 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
     onHandleMouseUp();
     onDragLeave(event);
 
-    const transferId = event.dataTransfer.getData("id");
+    const transferId = event.dataTransfer.getData("text");
+    dragging = null
 
     if (transferId !== group.id) {
       onSwapGroup(transferId, group.id);
@@ -55,9 +73,9 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
     }
   };
 
-  const onEdit = () => {
-    setIsEdit(true);
-  };
+  const onEdit = () => setIsEdit(true)
+  
+  const onTitleChange = (e) => setEditTitle(e.target.value);
 
   const onSave = () => {
     setIsEdit(false);
@@ -65,9 +83,6 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
     onChange({ ...group, title: editTitle });
   };
 
-  const onTitleChange = (e) => {
-    setEditTitle(e.target.value);
-  };
 
   if (mode === MODES.VIEW || group.type === GROUP_TYPES.START) {
     return (
@@ -139,21 +154,24 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
             alignItems: "center",
           }}
         >
-          <div style={{ flex: 1 }} onClick={onEdit}>
+          <div
+            className="title"
+            style={{ flex: 1 }}
+            onClick={onEdit}
+            onDragOver={onDragOver}
+          >
             {group.title}
           </div>
           <svg
             className="drag-handler"
             onMouseDown={onHandleMouseDown}
             onMouseUp={onHandleMouseUp}
+            onDragOver={onDragOver}
             width="14"
             height="14"
             viewBox="0 0 14 14"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={
-              isDragging ? { pointerEvents: "none", userSelect: "none" } : {}
-            }
           >
             <path
               d="M2.8 5.2L1 7M1 7L2.8 8.8M1 7H13M5.2 2.8L7 1M7 1L8.8 2.8M7 1V13M8.8 11.2L7 13M7 13L5.2 11.2M11.2 5.2L13 7M13 7L11.2 8.8"
@@ -171,7 +189,6 @@ export function Group({ isDragging, mode, group, onSwapGroup, onChange, onCreate
 
 Group.propTypes = {
   mode: types.string,
-  isDragging: types.bool,
   setSelected: types.func,
   group: types.any,
   onSwapGroup: types.func,

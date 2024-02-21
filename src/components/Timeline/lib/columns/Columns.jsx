@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import { Component } from 'react'
 
 import { iterateTimes } from '../utility/calendar'
 import { TimelineStateConsumer } from '../timeline/TimelineStateContext'
@@ -39,14 +39,14 @@ class Columns extends Component {
     const {
       canvasTimeStart,
       canvasTimeEnd,
-      canvasWidth,
+      // canvasWidth,
       minUnit,
       timeSteps,
       height,
       verticalLineClassNamesForTime,
       getLeftOffsetFromDate
     } = this.props
-    const ratio = canvasWidth / (canvasTimeEnd - canvasTimeStart)
+    // const ratio = canvasWidth / (canvasTimeEnd - canvasTimeStart)
 
     let lines = []
 

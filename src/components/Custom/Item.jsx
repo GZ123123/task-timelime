@@ -29,7 +29,7 @@ export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
       {...props}
       style={{...style, background, color: item.color, borderRadius: '8px' }}
     >
-      {itemContext.useResizeHandle && itemContext.selected ? <div {...leftResizeProps} /> : null}
+      {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
 
       <div
         style={{
@@ -43,7 +43,7 @@ export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
         {itemContext.title}
       </div>
 
-      {itemContext.useResizeHandle && itemContext.selected ? <div {...rightResizeProps} /> : null}
+      {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
     </div>
   );
 };

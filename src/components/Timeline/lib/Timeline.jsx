@@ -129,12 +129,12 @@ export default class ReactCalendarTimeline extends Component {
   };
 
   static defaultProps = {
-    sidebarWidth: 100,
+    sidebarWidth: 144,
     rightSidebarWidth: 0,
     dragSnap: 1000 * 60 * 15, // 15min
     minResizeWidth: 20,
-    lineHeight: 30,
-    itemHeightRatio: 0.65,
+    lineHeight: 56,
+    itemHeightRatio: 0.75,
     buffer: 3,
 
     minZoom: 60 * 60 * 1000, // 1 hour
@@ -142,10 +142,10 @@ export default class ReactCalendarTimeline extends Component {
 
     clickTolerance: 3, // how many pixels can we drag for it to be still considered a click?
 
-    canChangeGroup: true,
+    canChangeGroup: false,
     canMove: true,
-    canResize: "right",
-    useResizeHandle: false,
+    canResize: 'both',
+    useResizeHandle: true,
     canSelect: true,
 
     stackItems: false,

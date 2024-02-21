@@ -1,4 +1,4 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
 import Interval from './Interval'
 export function CustomDateHeader({
   headerContext: { intervals, unit },

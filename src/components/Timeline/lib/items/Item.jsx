@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 
 import { _get, deepObjectCompare } from "../utility/generic";
 import { composeEvents } from "../utility/events";
-import { defaultItemRenderer } from "./defaultItemRenderer";
+// import { defaultItemRenderer } from "./defaultItemRenderer";
 import { coordinateToTimeRatio } from "../utility/calendar";
 import { getSumScroll, getSumOffset } from "../utility/dom-helpers";
 import {
@@ -60,10 +60,10 @@ export default class Item extends Component {
     scrollRef: PropTypes.object,
   };
 
-  static defaultProps = {
-    selected: false,
-    itemRenderer: defaultItemRenderer,
-  };
+  // static defaultProps = {
+  //   selected: false,
+  //   itemRenderer: defaultItemRenderer,
+  // };
 
   static contextTypes = {
     getTimelineContext: PropTypes.func,

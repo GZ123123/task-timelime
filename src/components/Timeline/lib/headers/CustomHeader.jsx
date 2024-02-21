@@ -10,6 +10,7 @@ export class CustomHeader extends React.Component {
     children: PropTypes.func.isRequired,
     unit: PropTypes.string.isRequired,
     //Timeline context
+    timelineWidth: PropTypes.number,
     timeSteps: PropTypes.object.isRequired,
     visibleTimeStart: PropTypes.number.isRequired,
     visibleTimeEnd: PropTypes.number.isRequired,
@@ -64,7 +65,7 @@ export class CustomHeader extends React.Component {
     return false
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (
       nextProps.canvasTimeStart !== this.props.canvasTimeStart ||
       nextProps.canvasTimeEnd !== this.props.canvasTimeEnd ||
@@ -208,16 +209,15 @@ const CustomHeaderWrapper = ({ children, unit, headerData, height }) => (
       return (
         <TimelineHeadersConsumer>
           {({ timeSteps }) => (
-            <CustomHeader
-              children={children}
-              timeSteps={timeSteps}
-              showPeriod={showPeriod}
-              unit={unit ? unit : timelineState.timelineUnit}
-              {...timelineState}
-              headerData={headerData}
-              getLeftOffsetFromDate={getLeftOffsetFromDate}
-              height={height}
-            />
+            React.createElement(CustomHeader, {
+              timeSteps,
+              showPeriod,
+              height,
+              headerData,
+              getLeftOffsetFromDate,
+              unit: unit ? unit : timelineState.timelineUnit,
+              ...timelineState
+            }, children)
           )}
         </TimelineHeadersConsumer>
       )

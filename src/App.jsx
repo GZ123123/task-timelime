@@ -9,32 +9,6 @@ import { Header } from "./components/Custom/Header";
 import { Group } from "./components/Custom/Group";
 import { GROUP_TYPES, MODES } from "./constants";
 
-const KEYS = {
-  groupIdKey: "id",
-  groupTitleKey: "title",
-  groupRightTitleKey: "rightTitle",
-  itemIdKey: "id",
-  itemTitleKey: "title",
-  itemDivTitleKey: "title",
-  itemGroupKey: "group",
-  itemTimeStartKey: "start",
-  itemTimeEndKey: "end",
-  groupLabelKey: "title",
-};
-
-const CONFIGS = {
-  traditionalZoom: false,
-  itemHeightRatio: 0.75,
-  itemTouchSendsClick: false,
-  canMove: true,
-  canResize: true,
-  lineHeight: 56,
-  canChangeGroup: false,
-  fullUpdate: true,
-  useResizeHandle: false,
-  stackItems: true,
-};
-
 const emit = (name, value) => {
   const event = new CustomEvent(name, { detail: value });
 
@@ -71,6 +45,8 @@ export function App() {
         : item
     );
 
+    setItems(_items)
+
     emit("modify:items", _items)
   };
 
@@ -83,6 +59,8 @@ export function App() {
         ? Object.assign({}, item, { start, end })
         : item;
     });
+
+    setItems(_items)
 
     emit("modify:items", _items)
   };
@@ -158,8 +136,6 @@ export function App() {
       items={itemList}
       fakeItem={fakeItem}
       setFakeItem={setFakeItem}
-      keys={KEYS}
-      {...CONFIGS}
       
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}

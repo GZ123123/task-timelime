@@ -1,14 +1,14 @@
 export const defaultKeys = {
-  groupIdKey: 'id',
-  groupTitleKey: 'title',
-  groupRightTitleKey: 'rightTitle',
-  groupLabelKey: 'title',
-  itemIdKey: 'id',
-  itemTitleKey: 'title',
-  itemDivTitleKey: 'title',
-  itemGroupKey: 'group',
-  itemTimeStartKey: 'start_time',
-  itemTimeEndKey: 'end_time'
+  groupIdKey: "id",
+  groupTitleKey: "title",
+  groupRightTitleKey: "rightTitle",
+  itemIdKey: "id",
+  itemTitleKey: "title",
+  itemDivTitleKey: "title",
+  itemGroupKey: "group",
+  itemTimeStartKey: "start",
+  itemTimeEndKey: "end",
+  groupLabelKey: "title",
 }
 
 export const defaultTimeSteps = {

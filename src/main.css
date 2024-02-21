@@ -120,7 +120,7 @@
 
 .rct-items .rct-item .rct-item-handler {
   width: 5px !important;
-  cursor: col-resize !important;
+  cursor: ew-resize !important;
 }
 
 .custom-header {

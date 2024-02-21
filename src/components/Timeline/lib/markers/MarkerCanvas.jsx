@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MarkerCanvasProvider } from './MarkerCanvasContext'
-import TimelineMarkersRenderer from './TimelineMarkersRenderer'
+// import TimelineMarkersRenderer from './TimelineMarkersRenderer'
 import { TimelineStateConsumer } from '../timeline/TimelineStateContext'
 
 // expand to fill entire parent container (ScrollElement)
@@ -71,7 +71,7 @@ class MarkerCanvas extends React.Component {
           onMouseLeave={this.handleMouseLeave}
           ref={el => (this.containerEl = el)}
         >
-          <TimelineMarkersRenderer />
+          {/* <TimelineMarkersRenderer /> */}
           {this.props.children}
         </div>
       </MarkerCanvasProvider>
