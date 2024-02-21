@@ -7,7 +7,7 @@
     <title>Vite + React</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" data-defaultTimeStart="2024-01-01" data-defaultTimeEnd="2025-01-01"></div>
 
     <div id="editMode">Edit </div>
     
@@ -16,7 +16,6 @@
     <script>
       const root = document.querySelector('#root')
 
-      
         root.dataset.groups = JSON.stringify([
           { id: "0", title: "キックオフ", type: 1 },
           { id: "1", title: "Marguerite" },

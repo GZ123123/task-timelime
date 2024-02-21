@@ -49,7 +49,12 @@ export function App() {
   const [groups, setGroups] = useState(
     JSON.parse(root.dataset["groups"] ?? "[]")
   );
+
   const [mode, setMode] = useState(JSON.parse(root.dataset["mode"] ?? '"edit"'));
+
+  const handleItemCreate = (item) => {
+    emit("create:item", item )
+  }
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const group = groupList[newGroupOrder];
@@ -105,7 +110,7 @@ export function App() {
   };
 
   const onCreateItem = (group, time) => {
-    emit("create:item", { group, time })
+    emit("create:item", { group, start: time, end: time })
   }
 
   const onCreateGroup = () => {
@@ -147,8 +152,8 @@ export function App() {
   return (
     <Timeline
       mode={mode}
-      defaultTimeStart={new Date("2024-01-01")}
-      defaultTimeEnd={new Date("2025-01-01")}
+      defaultTimeStart={new Date(root.dataset["defaultTimeStart"] || "2024-01-01")}
+      defaultTimeEnd={new Date(root.dataset["defaultTimeEnd"] || "2025-01-01")}
       groups={groupList}
       items={itemList}
       fakeItem={fakeItem}
@@ -158,6 +163,7 @@ export function App() {
       
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
+      onItemCreate={handleItemCreate}
       onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
       onCanvasDoubleClick={onCreateItem}

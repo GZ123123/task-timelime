@@ -74,6 +74,7 @@ export default class ReactCalendarTimeline extends Component {
     onCanvasContextMenu: PropTypes.func,
     onZoom: PropTypes.func,
     onItemDrag: PropTypes.func,
+    onItemCreate: PropTypes.func,
 
     moveResizeValidator: PropTypes.func,
 
@@ -896,14 +897,23 @@ export default class ReactCalendarTimeline extends Component {
     this.props.scrollRef(el);
     this.scrollComponent = el;
   };
-
-  onCreateItem = (group, time) => {
+  generateItem = (group, time) => {
+    if(!this.props.onItemCreate) {
+      return null;
+    }
     const item = { id: Date.now(), group: group.id, start: time, end: time };
 
-    // this.fakeItem = item;
     this.props.setFakeItem(item);
 
     return item;
+  }
+  onCreateItem = ({ group, start, end }) => {
+    if(!this.props.onItemCreate) {
+      return
+    }
+    this.props.onItemCreate({ group, start, end })
+
+    this.props.setFakeItem(null)
   };
   onItemResizing = (item, resizeTime) => {
     this.props.setFakeItem({
@@ -984,8 +994,10 @@ export default class ReactCalendarTimeline extends Component {
           >
             <ScrollElementProvider
               scrollRef={this.scrollComponent}
+              items={items}
               buffer={buffer}
               dragSnap={dragSnap}
+              generateItem={this.generateItem}
               onCreateItem={this.onCreateItem}
               onResizing={this.onItemResizing}
             >

@@ -15,10 +15,6 @@ class ScrollElement extends Component {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
 
-    // canvasWidth: PropTypes.number.isRequired,
-    // canvasTimeStart: PropTypes.number.isRequired,
-    // canvasTimeEnd: PropTypes.number.isRequired,
-
     traditionalZoom: PropTypes.bool.isRequired,
     scrollRef: PropTypes.func.isRequired,
     isInteractingWithItem: PropTypes.bool.isRequired,
@@ -26,6 +22,7 @@ class ScrollElement extends Component {
     getTimeFromRowClickEvent: PropTypes.func.isRequired,
     tryCreateItem: PropTypes.func.isRequired,
     tryResizing: PropTypes.func.isRequired,
+    commitItem: PropTypes.func.isRequired,
 
     onScroll: PropTypes.func.isRequired,
   };
@@ -87,6 +84,9 @@ class ScrollElement extends Component {
 
   handleMouseUp = () => {
     // create item
+    if (this.currentItem) {
+      this.props.commitItem()
+    }
     this.currentItem = null;
 
     this.dragStartPosition = null;
@@ -175,7 +175,7 @@ class ScrollElement extends Component {
     const scrollComponentStyle = {
       width: `${width}px`,
       height: `${height + 20}px`, //20px to push the scroll element down off screen...?
-      cursor: isDragging ? "move" : "default",
+      cursor: isDragging ? "ew-resize" : "default",
       position: "relative",
     };
 
@@ -202,10 +202,11 @@ class ScrollElement extends Component {
 
 const ScrollElementWrapper = (props) => (
   <ScrollElementConsumer>
-    {({ tryCreateItem, tryResizing, getTimeFromRowClickEvent }) => (
+    {({ tryCreateItem, tryResizing, commitItem, getTimeFromRowClickEvent }) => (
       <ScrollElement
         tryCreateItem={tryCreateItem}
         tryResizing={tryResizing}
+        commitItem={commitItem}
         getTimeFromRowClickEvent={getTimeFromRowClickEvent}
         {...props}
       />

@@ -21,8 +21,9 @@ export class ScrollElementProvider extends React.Component {
     buffer: PropTypes.number,
     dragSnap: PropTypes.number,
 
-    groups: PropTypes.any,
     items: PropTypes.any,
+
+    generateItem: PropTypes.func.isRequired,
 
     onCreateItem: PropTypes.func.isRequired,
     onResizing: PropTypes.func.isRequired,
@@ -38,8 +39,13 @@ export class ScrollElementProvider extends React.Component {
         getTimeFromRowClickEvent: this.getTimeFromRowClickEvent,
         tryCreateItem: this.tryCreateItem,
         tryResizing: this.tryResizing,
+        commitItem: this.commitItem
       },
     };
+  }
+
+  isGroupHaveItem = (groupId) => {
+    return this.props.items.find(({group}) => group === groupId)
   }
 
   getTimeFromRowClickEvent = (e) => {
@@ -87,14 +93,16 @@ export class ScrollElementProvider extends React.Component {
   };
 
   selectGroup = (group) => {
-    this.currentGroup = group;
+    if(!this.isGroupHaveItem(group.id)) {
+      this.currentGroup = group;
+    }
   };
 
   tryCreateItem = (event) => {
     const time = this.getTimeFromRowClickEvent(event);
 
     if (this.currentGroup) {
-      this.currentItem = this.props.onCreateItem(this.currentGroup, time, time);
+      this.currentItem = this.props.generateItem(this.currentGroup, time, time);
 
       return this.currentItem;
     }
@@ -108,7 +116,18 @@ export class ScrollElementProvider extends React.Component {
     const resizeTime = this.resizeTimeSnap(this.timeFor(event));
 
     this.props.onResizing(this.currentItem.id, resizeTime, "right");
+
+    this.currentItem.end = resizeTime
   };
+
+  commitItem = () => {
+    if(this.currentItem) {
+      this.props.onCreateItem(this.currentItem)
+    }
+
+    this.currentGroup = null
+    this.currentItem = null
+  }
 
   render() {
     return (
