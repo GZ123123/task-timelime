@@ -5,8 +5,8 @@ export const MODES = {
 }
 
 export const GROUP_TYPES = {
-  PROCESS: 0,
   START: 1,
-  END: 2,
-  ADD_BUTTON: 3
+  PROCESS: 2,
+  END: 3,
+  ADD_BUTTON: 4
 }

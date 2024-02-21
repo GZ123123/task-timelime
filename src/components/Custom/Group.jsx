@@ -35,12 +35,19 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
   };
 
   const onDragEnter = () => {
+    if (!isProcess) {
+      return
+    }
+    
     if (dragging === group.id) return;
 
     parentRef.current.classList.add("drag-over");
   };
 
   const onDragLeave = (event) => {
+    if (!isProcess) {
+      return
+    }
     const transferId = event.dataTransfer.getData("id");
 
     if (transferId === group.id) return;
@@ -55,6 +62,9 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
   };
 
   const onDrop = (event) => {
+    if (!isProcess) {
+      return
+    }
     onHandleMouseUp();
     onDragLeave(event);
 
