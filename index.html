@@ -71,9 +71,21 @@
           console.log("create:group")
         })
 
+        root.addEventListener("remove:group", (e) => {
+          console.log("remove:group", e.detail)
+        })
+
         root.addEventListener("select:item", (e) => {
           console.log(`select:items`, e.detail);
         });
+
+        document.querySelector('#editMode').addEventListener('click', () => {
+          root.dataset.mode = JSON.stringify(root.dataset.mode === '"edit"' ? 'view' : 'edit');
+          
+          const event = new CustomEvent("sync:mode");
+
+          root.dispatchEvent(event);
+        })
       
       document.addEventListener("DOMContentLoaded", () => {
         window.renderCalendar("root");

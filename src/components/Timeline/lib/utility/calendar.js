@@ -330,7 +330,7 @@ export function groupStack(
           collidingItem = other
           break
         } else {
-          // console.log('dont test', other.top !== null, other !== item, other.stack);
+          console.log('dont test', other.top !== null, other !== item, other.stack);
         }
       }
 

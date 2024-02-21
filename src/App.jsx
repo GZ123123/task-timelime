@@ -95,6 +95,10 @@ export function App() {
     emit("create:group", null)
   }
 
+  const onRemoveGroup = (id) => {
+    emit("remove:group", id)
+  }
+
   const groupList = useMemo(() => {
     if (mode !== MODES.EDIT) return groups;
 
@@ -130,12 +134,16 @@ export function App() {
   return (
     <Timeline
       mode={mode}
+
+      sidebarWidth={mode === MODES.VIEW ? 100 : 144}
+
       defaultTimeStart={new Date(root.dataset["defaultTimeStart"] || "2024-01-01")}
       defaultTimeEnd={new Date(root.dataset["defaultTimeEnd"] || "2025-01-01")}
       groups={groupList}
       items={itemList}
       fakeItem={fakeItem}
       setFakeItem={setFakeItem}
+      
       
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
@@ -146,7 +154,7 @@ export function App() {
       
       itemRenderer={Item}
       groupRenderer={(props) => (
-        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup}/>
+        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup} onRemoveGroup={onRemoveGroup}/>
       )}
     >
       <TimelineHeaders className="sticky">
