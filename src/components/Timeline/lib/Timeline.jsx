@@ -25,6 +25,7 @@ import { TimelineHeadersProvider } from "./headers/HeadersContext";
 import TimelineHeaders from "./headers/TimelineHeaders";
 import DateHeader from "./headers/DateHeader";
 import { ScrollElementProvider } from "./scroll/ScrollElementContext";
+import { MODES } from "../../../constants";
 
 export default class ReactCalendarTimeline extends Component {
   static propTypes = {
@@ -386,6 +387,10 @@ export default class ReactCalendarTimeline extends Component {
       );
     }
 
+    if(nextProps.mode === MODES.VIEW) {
+      Object.assign(derivedState, { selectedItem: null })
+    }
+
     return derivedState;
   }
 
@@ -529,6 +534,9 @@ export default class ReactCalendarTimeline extends Component {
   };
 
   selectItem = (item, clickType, e) => {
+    if(this.props.mode === MODES.VIEW) {
+      return
+    }
     if (
       this.isItemSelected(item) ||
       (this.props.itemTouchSendsClick && clickType === "touch")

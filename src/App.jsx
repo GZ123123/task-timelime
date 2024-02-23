@@ -65,30 +65,40 @@ export function App() {
     emit("modify:items", _items)
   };
 
-  const onTimeChange = (start, end, fn) => fn(start, start + 12 * 30 * 24 * 60 * 60 * 1000)
-
   const onItemDoubleClick = (e) => {
     emit("select:item", e)
   };
 
   const onSwapGroup = (source, target) => {
-    const sourceIndex = groups.findIndex((group) => group.id === source);
-    const targetIndex = groups.findIndex((group) => group.id === target);
+    const sourceIndex = groups.findIndex((group) => Number(group.id) === Number(source))
+
+    const targetIndex = groups.findIndex((group) => Number(group.id) === Number(target));
 
     groups[sourceIndex] = groups.splice(targetIndex, 1, groups[sourceIndex])[0];
 
-    emit("edit:items", groups)
+    emit("modify:groups", groups)
   };
 
   const onChange = (v) => {
     const index = groups.findIndex((group) => group.id === v.id);
     groups[index].title = v.title;
 
-    emit("edit:items", groups)
+    emit("modify:groups", groups)
   };
 
   const onCreateItem = (group, time) => {
-    emit("create:item", { group, start: time, end: time })
+    const item = items.find(({ group: _group }) => Number(group) === Number(_group))
+    const _group = groups.find(({ id }) => Number(group) === Number(id))
+
+    if (_group?.type === GROUP_TYPES.START || _group?.type === GROUP_TYPES.END) {
+      return
+    }
+
+    if(!item) {
+      emit("create:item", { group, start: time, end: time })
+    } else {
+      emit('select:item', item.id)
+    }
   }
 
   const onCreateGroup = () => {
@@ -108,12 +118,7 @@ export function App() {
     ];
   }, [groups, mode]);
 
-  const itemList = useMemo(() => {
-    if(fakeItem) {
-      return [...items, fakeItem]
-    }
-    return [...items];
-  }, [items, fakeItem]);
+  const itemList = useMemo(() => fakeItem ? [...items, fakeItem]: [...items], [items, fakeItem]);
 
   useEffect(() => {
     const onChangeItems = () => setItems(JSON.parse(root.dataset.items));
@@ -144,11 +149,10 @@ export function App() {
       fakeItem={fakeItem}
       setFakeItem={setFakeItem}
       
-      
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
       onItemCreate={handleItemCreate}
-      onTimeChange={onTimeChange}
+      // onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
       onCanvasDoubleClick={onCreateItem}
       

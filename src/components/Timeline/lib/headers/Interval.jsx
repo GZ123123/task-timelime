@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { getNextUnit } from '../utility/calendar'
-import { composeEvents } from '../utility/events'
 
 class Interval extends React.PureComponent {
   static propTypes = {
@@ -33,7 +32,6 @@ class Interval extends React.PureComponent {
         interval: this.props.interval,
         ...props
       }),
-      onClick: composeEvents(this.onIntervalClick, props.onClick)
     }
   }
 

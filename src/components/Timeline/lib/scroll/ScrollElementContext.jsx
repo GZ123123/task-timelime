@@ -6,6 +6,7 @@ import {
   coordinateToTimeRatio,
 } from "../utility/calendar";
 import { getSumScroll, getSumOffset } from "../utility/dom-helpers";
+import { GROUP_TYPES } from "../../../../constants";
 
 const defaultContextState = {};
 
@@ -93,7 +94,7 @@ export class ScrollElementProvider extends React.Component {
   };
 
   selectGroup = (group) => {
-    if(!this.isGroupHaveItem(group.id)) {
+    if(!this.isGroupHaveItem(group.id) && group.type !== GROUP_TYPES.ADD_BUTTON) {
       this.currentGroup = group;
     }
   };

@@ -5,7 +5,14 @@ import { GROUP_TYPES, MODES } from "../../constants";
 
 let dragging = null;
 
-export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRemoveGroup }) {
+export function Group({
+  mode,
+  group,
+  onSwapGroup,
+  onChange,
+  onCreateGroup,
+  onRemoveGroup,
+}) {
   const parentRef = useRef();
 
   const [isEdit, setIsEdit] = useState(false);
@@ -36,9 +43,9 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
 
   const onDragEnter = () => {
     if (!isProcess) {
-      return
+      return;
     }
-    
+
     if (dragging === group.id) return;
 
     parentRef.current.classList.add("drag-over");
@@ -46,7 +53,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
 
   const onDragLeave = (event) => {
     if (!isProcess) {
-      return
+      return;
     }
     const transferId = event.dataTransfer.getData("id");
 
@@ -63,7 +70,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
 
   const onDrop = (event) => {
     if (!isProcess) {
-      return
+      return;
     }
     onHandleMouseUp();
     onDragLeave(event);
@@ -92,22 +99,22 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
   };
 
   const onRemove = () => {
-    onRemoveGroup(group.id)
+    onRemoveGroup(group.id);
   };
 
   useEffect(() => {
-    const el = document.querySelector('.rct-sidebar')
+    const el = document.querySelector(".rct-sidebar");
     const handleMouseLeave = () => {
-      if(el.classList.contains('dragging')) {
-        el.classList.remove('dragging')
+      if (el.classList.contains("dragging")) {
+        el.classList.remove("dragging");
       }
-    }
-    el.addEventListener('mouseleave', handleMouseLeave)
+    };
+    el.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      el.removeEventListener('mouseleave', handleMouseLeave)
-    }
-  }, [])
+      el.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
 
   // #region Render
   const DragIcon = (props) => {
@@ -157,7 +164,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
       >
         <path
           d="M13.333 4.66797L6.66634 11.3346L3.33301 8.0013"
-          stroke="#4B2396"
+          stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -188,7 +195,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
   return (
     <div className="group-container" ref={parentRef} onDragStart={onDragStart}>
       <div className="group-item-remove" onDragOver={onDragOver}>
-        <RemoveIcon onClick={onRemove} />
+        {isProcess && <RemoveIcon onClick={onRemove} />}
       </div>
       <div
         className="group-item"
@@ -200,6 +207,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
         {isEdit ? (
           <div className="form-control edit">
             <input
+              maxLength={25}
               autoFocus
               style={{ width: "100%" }}
               type="text"
@@ -208,7 +216,7 @@ export function Group({ mode, group, onSwapGroup, onChange, onCreateGroup, onRem
             />
 
             <div onClick={onSubmit}>
-              <SubmitIcon />
+              <SubmitIcon style={editTitle.length ? { color: '#4B2396', cursor: 'pointer' } : { color: '#A4A4A4', cursor: 'not-allowed' }} />
             </div>
           </div>
         ) : (

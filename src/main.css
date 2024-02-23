@@ -121,6 +121,10 @@
   border: none !important;
   overflow: hidden !important;
 }
+.react-calendar-timeline .rct-items .rct-item.start {
+  border: none !important;
+  overflow: visible !important;
+}
 
 .react-calendar-timeline .rct-items .rct-item .rct-item-handler {
   width: 5px !important;
@@ -133,7 +137,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  cursor: pointer;
+  /* cursor: pointer; */
   font-size: 14px;
   border-left: 1px solid #bbb;
 }

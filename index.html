@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,86 +7,129 @@
     <title>Vite + React</title>
   </head>
   <body>
-    <div id="root" data-defaultTimeStart="2024-01-01" data-defaultTimeEnd="2025-01-01"></div>
+    <div
+      id="root"
+      data-mode='"view"'
+      data-defaultTimeStart="2024-01-01"
+      data-defaultTimeEnd="2025-01-01"
+    ></div>
 
-    <div id="editMode">Edit </div>
-    
+    <div id="editMode">Edit</div>
+
+    <div id="fetchData">fetch</div>
+
     <script type="module" src="/src/main.jsx"></script>
-    
+
     <script>
-      const root = document.querySelector('#root')
+      const root = document.querySelector("#root");
 
+      root.dataset.groups = JSON.stringify([
+        { id: "0", title: "キックオフ", type: 1 },
+        { id: "1", title: "Marguerite" },
+        { id: "2", title: "受け入れ 試験" },
+        { id: "3", title: "納品", type: 3 },
+      ]);
+      root.dataset.items = JSON.stringify([
+        {
+          id: "0",
+          group: "1",
+          start: 1706310000000,
+          end: 1720575339222,
+        },
+        {
+          id: "-1",
+          group: "0",
+          title: "masker",
+          type: 1,
+          start: 1706310000000,
+          end: 1706310000000,
+        },
+        {
+          id: "-2",
+          group: "3",
+          title: "masker",
+          type: 3,
+          start: 1720575339222,
+          end: 1720575339222,
+        },
+      ]);
+
+      root.addEventListener("modify:groups", (e) => {
+        root.dataset.groups = JSON.stringify(e.detail);
+
+        const event = new CustomEvent("sync:groups");
+
+        root.dispatchEvent(event);
+      });
+
+      root.addEventListener("modify:groups", (e) => {
+        console.log("modify:groups", e.detail);
+      });
+
+      root.addEventListener("modify:items", (e) => {
+        console.log("modify:items", e.detail);
+      });
+
+      root.addEventListener("create:item", (e) => {
+        console.log("create:item", e.detail);
+      });
+
+      root.addEventListener("create:group", () => {
+        console.log("create:group");
+      });
+
+      root.addEventListener("remove:group", (e) => {
+        console.log("remove:group", e.detail);
+      });
+
+      root.addEventListener("select:item", (e) => {
+        console.log(`select:items`, e.detail);
+      });
+
+      document.querySelector("#editMode").addEventListener("click", () => {
+        root.dataset.mode = JSON.stringify(
+          root.dataset.mode === '"edit"' ? "view" : "edit"
+        );
+
+        const event = new CustomEvent("sync:mode");
+
+        root.dispatchEvent(event);
+      });
+
+      document.querySelector("#fetchData").addEventListener("click", () => {
         root.dataset.groups = JSON.stringify([
-          { id: "0", title: "キックオフ", type: 1 },
-          { id: "1", title: "Marguerite" },
-          { id: "2", title: "受け入れ 試験" },
-          { id: "3", title: "納品", type: 3 },
-        ]);
-        root.dataset.items = JSON.stringify([
-          {
-            id: "0",
-            group: "1",
-            start: 1706310000000,
-            end: 1720575339222,
-          },
-          {
-            id: "-1",
-            group: "0",
-            title: "masker",
-            type: 1,
-            start: 1706310000000,
-            end: 1706310000000,
-          },
-          {
-            id: "-2",
-            group: "3",
-            title: "masker",
-            type: 2,
-            start: 1720575339222,
-            end: 1720575339222,
-          },
+          { id: "1", title: "キックオフ", type: 1 },
+          { id: "2", title: "納品", type: 3 },
         ]);
 
-        root.addEventListener("modify:groups", (e) => {
-          root.dataset.groups = JSON.stringify(e.detail);
+        const eventGroups = new CustomEvent("sync:groups");
 
-          const event = new CustomEvent("sync:groups");
+        root.dispatchEvent(eventGroups);
 
-          root.dispatchEvent(event);
-        });
+        setTimeout(() => {
+          root.dataset.items = JSON.stringify([
+            {
+              id: "1",
+              group: "1",
+              type: 1,
+              start: 1704067200000,
+              end: 1704067200000,
+            },
+            {
+              id: "2",
+              group: "2",
+              type: 3,
+              start: 1706745600000,
+              end: 1706745600000,
+            },
+          ]);
 
-        root.addEventListener("modify:groups", (e) => {
-          console.log("modify:groups", e.detail);
-        });
+          const eventItems = new CustomEvent("sync:items");
 
-        root.addEventListener("modify:items", (e) => {
-          console.log("modify:items", e.detail);
-        });
+          root.dispatchEvent(eventItems);
+        }, 100);
+      });
 
-        root.addEventListener("create:item", (e) => {
-          console.log("create:item", e.detail);
-        });
-
-        root.addEventListener("create:group", () => {
-          console.log("create:group")
-        })
-
-        root.addEventListener("remove:group", (e) => {
-          console.log("remove:group", e.detail)
-        })
-
-        root.addEventListener("select:item", (e) => {
-          console.log(`select:items`, e.detail);
-        });
-
-        document.querySelector('#editMode').addEventListener('click', () => {
-          root.dataset.mode = JSON.stringify(root.dataset.mode === '"edit"' ? 'view' : 'edit');
-          
-          const event = new CustomEvent("sync:mode");
-
-          root.dispatchEvent(event);
-        })
-      
       document.addEventListener("DOMContentLoaded", () => {
         window.renderCalendar("root");
       });
