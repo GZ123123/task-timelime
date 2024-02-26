@@ -2,6 +2,7 @@ import types from "prop-types";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { GROUP_TYPES, MODES } from "../../constants";
+import { Tooltip } from "./Tooltip";
 
 let dragging = null;
 
@@ -176,7 +177,8 @@ export function Group({
   if (mode === MODES.VIEW) {
     return (
       <div className="group-item">
-        <div>{group.title}</div>
+        {/* <div className="title">{group.title}</div> */}
+        <Tooltip className="title" text={group.title}>{group.title}</Tooltip>
       </div>
     );
   }
@@ -221,7 +223,7 @@ export function Group({
           </div>
         ) : (
           <div className="form-control">
-            <span onClick={onEdit}>{group.title}</span>
+            <Tooltip className="title" text={group.title} onClick={onEdit}>{group.title}</Tooltip>
             {isProcess && (
               <div
                 className="drag-handler"

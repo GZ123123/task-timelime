@@ -178,10 +178,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 
   text-wrap: pretty;
   line-height: normal;
   text-align: center;
+}
+.react-calendar-timeline .group-item .title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.react-calendar-timeline-tooltip {
+  position: absolute;
+  /* transparent backfound color */
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
 }
 .react-calendar-timeline .group-item .form-control {
   width: 100%;
@@ -190,7 +207,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.react-calendar-timeline .group-item .form-control span {
+.react-calendar-timeline .group-item .form-control .title {
   cursor: pointer;
   width: 100%;
 }
@@ -207,4 +224,8 @@
 .rct-sidebar.dragging .group-item-remove *,
 .rct-sidebar.dragging .group-item * {
   pointer-events: none;
+}
+
+.react-calendar-timeline .group-item {
+
 }
