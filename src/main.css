@@ -213,7 +213,7 @@
 }
 .react-calendar-timeline .group-item .form-control.edit {
   height: unset;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #4B2396;
 }
 
 .react-calendar-timeline .group-item .form-control input {

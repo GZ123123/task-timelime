@@ -135,7 +135,7 @@ export default class ReactCalendarTimeline extends Component {
     dragSnap: 1000 * 60 * 15, // 15min
     minResizeWidth: 20,
     lineHeight: 56,
-    itemHeightRatio: 0.75,
+    itemHeightRatio: 0.93,
     buffer: 3,
 
     minZoom: 60 * 60 * 1000, // 1 hour
