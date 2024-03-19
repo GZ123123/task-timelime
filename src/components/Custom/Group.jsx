@@ -89,7 +89,11 @@ export function Group({
     }
   };
 
-  const onEdit = () => setIsEdit(true);
+  const onEdit = () => {
+    onChange({ ...group, isError: true });
+
+    // setIsEdit(true)
+  };
 
   const onTitleChange = (e) => setEditTitle(e.target.value);
 

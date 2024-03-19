@@ -315,7 +315,11 @@ export function groupStack(
   let curHeight = groupHeight
   let verticalMargin = (lineHeight - item.dimensions.height) / 2
   if (item.dimensions.stack && item.dimensions.top === null) {
-    item.dimensions.top = groupTop + verticalMargin
+    item.dimensions.top = groupTop + verticalMargin + 50
+
+    console.log('log - item.dimensions: ', item.dimensions)
+
+    console.log('log - calendar - item: ', item)
     curHeight = Math.max(curHeight, lineHeight)
     do {
       var collidingItem = null
@@ -335,6 +339,7 @@ export function groupStack(
       }
 
       if (collidingItem != null) {
+        console.log('log - collidingItem', collidingItem)
         // There is a collision. Reposition the items above the colliding element
         item.dimensions.top = collidingItem.dimensions.top + lineHeight
         curHeight = Math.max(
@@ -353,10 +358,12 @@ export function groupStack(
 }
 
 // Calculate the position of this item for a group that is not being stacked
-export function groupNoStack(lineHeight, item, groupHeight, groupTop) {
+export function groupNoStack(lineHeight, item, groupHeight, groupTop, errorItems) {
   let verticalMargin = (lineHeight - item.dimensions.height) / 2
+  console.log('log - groupNoStack - errorItems: ', errorItems)
   if (item.dimensions.top === null) {
-    item.dimensions.top = groupTop + verticalMargin
+    // todo: custom - height of item that after error item
+    item.dimensions.top = groupTop + verticalMargin + (errorItems * 50)
     groupHeight = Math.max(groupHeight, lineHeight)
   }
   return { groupHeight, verticalMargin: 0, itemTop: item.dimensions.top }
@@ -379,6 +386,8 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
 
   var groupedItems = getGroupedItems(itemsDimensions, groupOrders)
 
+  let errorItems = 0
+
   for (var index in groupedItems) {
     const groupItems = groupedItems[index]
     const { items: itemsDimensions, group } = groupItems
@@ -387,11 +396,15 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
     // Is group being stacked?
     const isGroupStacked =
       group.stackItems !== undefined ? group.stackItems : stackItems
+
+    // todo: custom - height of item that after error item 
+
     const { groupHeight } = stackGroup(
       itemsDimensions,
       isGroupStacked,
       lineHeight,
-      groupTop
+      groupTop,
+      errorItems
     )
     // If group height is overridden, push new height
     // Do this late as item position still needs to be calculated
@@ -401,7 +414,13 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
     } else {
       groupHeights.push(Math.max(groupHeight, lineHeight))
     }
+
+    if(group.isError) {
+      errorItems ++
+    }
   }
+
+  console.log('log - calendar - stackAll after: ', JSON.stringify(itemsDimensions))
   
   return {
     height: sum(groupHeights),
@@ -417,12 +436,13 @@ export function stackAll(itemsDimensions, groupOrders, lineHeight, stackItems) {
  * @param {*} lineHeight 
  * @param {*} groupTop 
  */
-export function stackGroup(itemsDimensions, isGroupStacked, lineHeight, groupTop) {
+export function stackGroup(itemsDimensions, isGroupStacked, lineHeight, groupTop, errorItems) {
   var groupHeight = 0
   var verticalMargin = 0
   // Find positions for each item in group
   for (let itemIndex = 0; itemIndex < itemsDimensions.length; itemIndex++) {
     let r = {}
+    
     if (isGroupStacked) {
       r = groupStack(
         lineHeight,
@@ -433,8 +453,9 @@ export function stackGroup(itemsDimensions, isGroupStacked, lineHeight, groupTop
         itemIndex
       )
     } else {
-      r = groupNoStack(lineHeight, itemsDimensions[itemIndex], groupHeight, groupTop)
+      r = groupNoStack(lineHeight, itemsDimensions[itemIndex], groupHeight, groupTop, errorItems)
     }
+
     groupHeight = r.groupHeight
     verticalMargin = r.verticalMargin
   }
@@ -530,6 +551,8 @@ export function stackTimelineItems(
     lineHeight,
     stackItems
   )
+  console.log('log - calendar - dimensionsItems: ', JSON.stringify(dimensionItems))
+
   return { dimensionItems, height, groupHeights, groupTops }
 }
 

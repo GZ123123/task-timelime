@@ -38,7 +38,12 @@ export default class GroupRows extends Component {
     } = this.props
     let lines = []
 
+    console.log('log - groups: ', groups)
+
     for (let i = 0; i < lineCount; i++) {
+      // todo: custom - height of error
+      const height = groupHeights[i] + (groups[i].isError ? 50 : 0)
+      
       lines.push(
         <GroupRow
           clickTolerance={clickTolerance}
@@ -51,7 +56,7 @@ export default class GroupRows extends Component {
           horizontalLineClassNamesForGroup={horizontalLineClassNamesForGroup}
           style={{
             width: `${canvasWidth}px`,
-            height: `${groupHeights[i]}px`
+            height: `${height}px`
           }}
         />
       )

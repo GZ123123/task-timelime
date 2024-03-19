@@ -314,6 +314,8 @@ export default class ReactCalendarTimeline extends Component {
     this.state.groupTops = groupTops;
 
     /* eslint-enable */
+
+    console.log('log - Timeline - dimensionItems: ', dimensionItems)
   }
 
   componentDidMount() {

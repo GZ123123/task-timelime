@@ -44,6 +44,8 @@ export default class Sidebar extends Component {
     const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys;
 
     let groupLines = this.props.groups.map((group, index) => {
+      // todo: custom - height of error group
+      const height = groupHeights[index] + (group.isError ? 50 : 0)
       return (
         <div
           key={_get(group, groupIdKey)}
@@ -51,7 +53,7 @@ export default class Sidebar extends Component {
             index % 2 ? "even" : "old"
           }`}
           style={{
-            height: `${groupHeights[index]}px`,
+            height: `${height}px`,
             lineHeight: `${groupHeights[index]}px`,
           }}
         >

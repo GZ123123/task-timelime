@@ -82,6 +82,7 @@ export function App() {
   const onChange = (v) => {
     const index = groups.findIndex((group) => group.id === v.id);
     groups[index].title = v.title;
+    groups[index].isError = v.isError;
 
     emit("modify:groups", groups)
   };
@@ -137,7 +138,8 @@ export function App() {
   }, []);
 
   return (
-    <Timeline
+    <>
+      <Timeline
       mode={mode}
 
       sidebarWidth={mode === MODES.VIEW ? 100 : 144}
@@ -165,5 +167,7 @@ export function App() {
         <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
       </TimelineHeaders>
     </Timeline>
+    {JSON.stringify(groupList)}
+    </>
   );
 }
