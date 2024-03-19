@@ -315,7 +315,7 @@ export function groupStack(
   let curHeight = groupHeight
   let verticalMargin = (lineHeight - item.dimensions.height) / 2
   if (item.dimensions.stack && item.dimensions.top === null) {
-    item.dimensions.top = groupTop + verticalMargin + 50
+    item.dimensions.top = groupTop + verticalMargin + 22
 
     console.log('log - item.dimensions: ', item.dimensions)
 
@@ -363,7 +363,7 @@ export function groupNoStack(lineHeight, item, groupHeight, groupTop, errorItems
   console.log('log - groupNoStack - errorItems: ', errorItems)
   if (item.dimensions.top === null) {
     // todo: custom - height of item that after error item
-    item.dimensions.top = groupTop + verticalMargin + (errorItems * 50)
+    item.dimensions.top = groupTop + verticalMargin + (errorItems * 22)
     groupHeight = Math.max(groupHeight, lineHeight)
   }
   return { groupHeight, verticalMargin: 0, itemTop: item.dimensions.top }

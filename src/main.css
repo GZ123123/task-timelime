@@ -155,10 +155,10 @@
   grid-template-columns: 16px auto;
   column-gap: 4px;
 
-  position: relative
+  position: relative;
 }
 .react-calendar-timeline .group-container.drag-over::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 4px;
   left: 0;
@@ -213,7 +213,7 @@
 }
 .react-calendar-timeline .group-item .form-control.edit {
   height: unset;
-  border-bottom: 1px solid #4B2396;
+  border-bottom: 1px solid #4b2396;
 }
 
 .react-calendar-timeline .group-item .form-control input {
@@ -226,6 +226,11 @@
   pointer-events: none;
 }
 
-.react-calendar-timeline .group-item {
-
+.react-calendar-timeline .error-message {
+  padding: 0px 16px 0px 16px;
+  color: #b00020;
+  font-size: 12px;
+  line-height: 16px;
+  min-height: 14px;
+  min-width: 1px;
 }

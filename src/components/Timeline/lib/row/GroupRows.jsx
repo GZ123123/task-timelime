@@ -42,7 +42,7 @@ export default class GroupRows extends Component {
 
     for (let i = 0; i < lineCount; i++) {
       // todo: custom - height of error
-      const height = groupHeights[i] + (groups[i].isError ? 50 : 0)
+      const height = groupHeights[i] + (groups[i].isError ? 22 : 0)
       
       lines.push(
         <GroupRow

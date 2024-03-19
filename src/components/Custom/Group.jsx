@@ -90,9 +90,9 @@ export function Group({
   };
 
   const onEdit = () => {
-    onChange({ ...group, isError: true });
+    // onChange({ ...group, isError: true });
 
-    // setIsEdit(true)
+    setIsEdit(true);
   };
 
   const onTitleChange = (e) => setEditTitle(e.target.value);
@@ -120,6 +120,13 @@ export function Group({
       el.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
+  
+  useEffect(() => {
+    if(!editTitle) {
+      onChange({ ...group, title: editTitle, isError: true })
+    }
+  }, [editTitle])
+
 
   // #region Render
   const DragIcon = (props) => {
@@ -182,7 +189,9 @@ export function Group({
     return (
       <div className="group-item">
         {/* <div className="title">{group.title}</div> */}
-        <Tooltip className="title" text={group.title}>{group.title}</Tooltip>
+        <Tooltip className="title" text={group.title}>
+          {group.title}
+        </Tooltip>
       </div>
     );
   }
@@ -199,48 +208,67 @@ export function Group({
   }
 
   return (
-    <div className="group-container" ref={parentRef} onDragStart={onDragStart}>
-      <div className="group-item-remove" onDragOver={onDragOver}>
-        {isProcess && <RemoveIcon onClick={onRemove} />}
-      </div>
+    <div>
       <div
-        className="group-item"
-        onDrop={onDrop}
-        onDragEnter={onDragEnter}
-        onDragLeave={onDragLeave}
-        onDragOver={onDragOver}
+        className="group-container"
+        ref={parentRef}
+        onDragStart={onDragStart}
       >
-        {isEdit ? (
-          <div className="form-control edit">
-            <input
-              maxLength={25}
-              autoFocus
-              style={{ width: "100%" }}
-              type="text"
-              value={editTitle}
-              onChange={onTitleChange}
-            />
+        <div className="group-item-remove" onDragOver={onDragOver}>
+          {isProcess && <RemoveIcon onClick={onRemove} />}
+        </div>
+        <div
+          className="group-item"
+          onDrop={onDrop}
+          onDragEnter={onDragEnter}
+          onDragLeave={onDragLeave}
+          onDragOver={onDragOver}
+        >
+          {isEdit ? (
+            <div className="form-control edit">
+              <input
+                maxLength={25}
+                autoFocus
+                style={{ width: "100%" }}
+                type="text"
+                value={editTitle}
+                onChange={onTitleChange}
+              />
 
-            <div onClick={onSubmit}>
-              <SubmitIcon style={editTitle.length ? { color: '#4B2396', cursor: 'pointer' } : { color: '#A4A4A4', cursor: 'not-allowed' }} />
-            </div>
-          </div>
-        ) : (
-          <div className="form-control">
-            <Tooltip className="title" text={group.title} onClick={onEdit}>{group.title}</Tooltip>
-            {isProcess && (
-              <div
-                className="drag-handler"
-                onMouseDown={onHandleMouseDown}
-                onMouseUp={onHandleMouseUp}
-                onDragOver={onDragOver}
-              >
-                <DragIcon draggable style={{ pointerEvent: "none" }} />
+              <div onClick={onSubmit}>
+                <SubmitIcon
+                  style={
+                    editTitle.length
+                      ? { color: "#4B2396", cursor: "pointer" }
+                      : { color: "#A4A4A4", cursor: "not-allowed" }
+                  }
+                />
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="form-control">
+              <Tooltip className="title" text={group.title} onClick={onEdit}>
+                {group.title}
+              </Tooltip>
+              {isProcess && (
+                <div
+                  className="drag-handler"
+                  onMouseDown={onHandleMouseDown}
+                  onMouseUp={onHandleMouseUp}
+                  onDragOver={onDragOver}
+                >
+                  <DragIcon draggable style={{ pointerEvent: "none" }} />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+      {!editTitle && (
+        <div className="error-message">
+          保守の内容は510文字以内に入力してください。
+        </div>
+      )}
     </div>
   );
   // #endregion
