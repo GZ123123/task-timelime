@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import { Component } from "react";
 
 import { _get, arraysEqual } from "../utility/generic";
+import Group from './Group'
 
 export default class Sidebar extends Component {
   static propTypes = {
@@ -26,22 +27,22 @@ export default class Sidebar extends Component {
     );
   }
 
-  renderGroupContent(group, isRightSidebar, groupTitleKey, groupRightTitleKey) {
-    if (this.props.groupRenderer) {
-      return React.createElement(this.props.groupRenderer, {
-        mode: this.props.mode,
-        group,
-        isRightSidebar,
-      });
-    } else {
-      return _get(group, isRightSidebar ? groupRightTitleKey : groupTitleKey);
-    }
-  }
+  // renderGroupContent(group, isRightSidebar, groupTitleKey, groupRightTitleKey) {
+  //   if (this.props.groupRenderer) {
+  //     return React.createElement(this.props.groupRenderer, {
+  //       mode: this.props.mode,
+  //       group,
+  //       isRightSidebar,
+  //     });
+  //   } else {
+  //     return _get(group, isRightSidebar ? groupRightTitleKey : groupTitleKey);
+  //   }
+  // }
 
   render() {
     const { width, groupHeights, height, isRightSidebar } = this.props;
 
-    const { groupIdKey, groupTitleKey, groupRightTitleKey } = this.props.keys;
+    const { groupIdKey /*, groupTitleKey, groupRightTitleKey */ } = this.props.keys;
 
     let groupLines = this.props.groups.map((group, index) => {
       // todo: custom - height of error group
@@ -57,12 +58,13 @@ export default class Sidebar extends Component {
             lineHeight: `${groupHeights[index]}px`,
           }}
         >
-          {this.renderGroupContent(
+          {/* {this.renderGroupContent(
             group,
             isRightSidebar,
             groupTitleKey,
             groupRightTitleKey
-          )}
+          )} */}
+          <Group id={_get(group, groupIdKey)}  />
         </div>
       );
     });
