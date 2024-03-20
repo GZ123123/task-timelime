@@ -1,12 +1,17 @@
 import types from "prop-types";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, memo } from "react";
 
 import { GROUP_TYPES, MODES } from "../../constants";
 import { Tooltip } from "./Tooltip";
+import { GroupConsumer } from "./Provider";
 
 let dragging = null;
 
 export function Group({
+  error,
+  editing,
+  setEditing,
+  setError,
   mode,
   group,
   onSwapGroup,
@@ -15,8 +20,9 @@ export function Group({
   onRemoveGroup,
 }) {
   const parentRef = useRef();
+  const editingRef = useRef();
 
-  const [isEdit, setIsEdit] = useState(false);
+  // const [isEdit, setIsEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(group.title);
   const isProcess = useMemo(
     () =>
@@ -90,15 +96,18 @@ export function Group({
   };
 
   const onEdit = () => {
-    // onChange({ ...group, isError: true });
+    editingRef.current = group.id
+    setEditing(group.id)
+    console.log('log - onEdit: ', editingRef.current)
 
-    setIsEdit(true);
   };
 
   const onTitleChange = (e) => setEditTitle(e.target.value);
 
   const onSubmit = () => {
-    setIsEdit(false);
+    // setIsEdit(false);
+    editingRef.current = null
+    setEditing(null)
 
     onChange({ ...group, title: editTitle });
   };
@@ -114,18 +123,39 @@ export function Group({
         el.classList.remove("dragging");
       }
     };
+    const handleClickOutside = (e) => {
+      // console.log(editingRef.current , group.id)
+      // if(editingRef.current !== group.id) {
+      //   editingRef.current = null
+      //   return
+      // }
+
+      // if(!parentRef.current.contains(e.target)) {
+      //   console.log('click out side', parentRef.current, e.target, editingRef.current, group.id)
+      //   editingRef.current = null
+      //   setEditing(null)
+      //   // setError(null)
+      // }
+    }
     el.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener('click', handleClickOutside)
 
     return () => {
       el.removeEventListener("mouseleave", handleMouseLeave);
-    };
+    window.removeEventListener('click', handleClickOutside)
+  };
   }, []);
+
+  useEffect(() => {
+    editingRef.current = editing
+    if(!editing) {
+      setEditTitle(group.title)
+    } 
+  }, [editing, group.title])
   
   useEffect(() => {
-    if(!editTitle) {
-      onChange({ ...group, title: editTitle, isError: true })
-    }
-  }, [editTitle])
+    setError(!editTitle)
+  }, [editTitle, setError])
 
 
   // #region Render
@@ -218,13 +248,14 @@ export function Group({
           {isProcess && <RemoveIcon onClick={onRemove} />}
         </div>
         <div
+        onClick={onEdit}
           className="group-item"
           onDrop={onDrop}
           onDragEnter={onDragEnter}
           onDragLeave={onDragLeave}
           onDragOver={onDragOver}
         >
-          {isEdit ? (
+          {editing === group.id ? (
             <div className="form-control edit">
               <input
                 maxLength={25}
@@ -246,8 +277,8 @@ export function Group({
               </div>
             </div>
           ) : (
-            <div className="form-control">
-              <Tooltip className="title" text={group.title} onClick={onEdit}>
+            <div className="form-control" >
+              <Tooltip className="title" text={group.title} >
                 {group.title}
               </Tooltip>
               {isProcess && (
@@ -264,7 +295,7 @@ export function Group({
           )}
         </div>
       </div>
-      {!editTitle && (
+      {(editing === group.id && error) && (
         <div className="error-message">
           保守の内容は510文字以内に入力してください。
         </div>
@@ -275,6 +306,10 @@ export function Group({
 }
 
 Group.propTypes = {
+  error: types.string,
+  editing: types.string,
+  setEditing: types.func,
+  setError: types.func,
   mode: types.string,
   setSelected: types.func,
   group: types.any,
@@ -283,3 +318,16 @@ Group.propTypes = {
   onRemoveGroup: types.func,
   onChange: types.func,
 };
+
+export function GroupWrapper(props) {
+  return <GroupConsumer>
+    {(_props) => <Group  {...props} {..._props}/>}
+  </GroupConsumer>
+}
+
+export const GroupWrapperMemo = memo(GroupWrapper, (prev, next) => {
+
+  console.log('memo ')
+
+  return prev.group.id === next.group.id && prev.group.title === next.group.title
+})

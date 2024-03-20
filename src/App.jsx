@@ -6,8 +6,9 @@ import { Item } from "./components/Custom/Item";
 
 import { root } from "./main";
 import { Header } from "./components/Custom/Header";
-import { Group } from "./components/Custom/Group";
+import { GroupWrapper } from "./components/Custom/Group";
 import { GROUP_TYPES, MODES } from "./constants";
+import { GroupProvider } from "./components/Custom/Provider";
 
 const emit = (name, value) => {
   const event = new CustomEvent(name, { detail: value });
@@ -138,7 +139,7 @@ export function App() {
   }, []);
 
   return (
-    <>
+    <GroupProvider>
       <Timeline
       mode={mode}
 
@@ -160,14 +161,13 @@ export function App() {
       
       itemRenderer={Item}
       groupRenderer={(props) => (
-        <Group {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup} onRemoveGroup={onRemoveGroup}/>
+        <GroupWrapper {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup} onRemoveGroup={onRemoveGroup}/>
       )}
     >
       <TimelineHeaders className="sticky">
         <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
       </TimelineHeaders>
     </Timeline>
-    {JSON.stringify(groupList)}
-    </>
+    </GroupProvider>
   );
 }
