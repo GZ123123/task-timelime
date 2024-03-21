@@ -211,6 +211,7 @@ export function App() {
       onCreateGroup={onCreateGroup}
       onRemoveGroup={onRemoveGroup}
       moveResizeValidator={moveResizeValidator}
+      useResizeHandle={mode === MODES.EDIT ? true : false}
     >
       <TimelineHeaders className="sticky">
         <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />

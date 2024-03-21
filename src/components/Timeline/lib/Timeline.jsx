@@ -938,6 +938,9 @@ class ReactCalendarTimeline extends Component {
     this.scrollComponent = el;
   };
   generateItem = (group, time) => {
+    if (this.props.mode === MODES.VIEW) {
+      return;
+    }
     if (!this.props.onItemCreate) {
       return null;
     }
