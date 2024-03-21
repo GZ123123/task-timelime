@@ -109,8 +109,6 @@ export default class Items extends Component {
     );
     const sortedDimensionItems = keyBy(dimensionItems, "id");
 
-    console.log('log - sortedDimensionItems: ', sortedDimensionItems)
-
     return (
       <div className="rct-items">
         {visibleItems

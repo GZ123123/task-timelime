@@ -1,48 +1,50 @@
-import { Component, createContext } from "react"
-import PropTypes from 'prop-types'
+import { Component, createContext } from "react";
+import PropTypes from "prop-types";
 
 const defaultContextState = {
-  error: null,
-  editing: '',
+  error: false,
+  editing: "",
+
   setEditing: () => {
-    console.warn('default set editing used')
-    return 
+    console.warn("default set editing used");
+    return;
   },
   setError: () => {
-    console.warn('default set error used')
-    return 
-  }
-}
+    console.warn("default set error used");
+    return;
+  },
+};
 
-const { Consumer, Provider } = createContext(defaultContextState)
+const { Consumer, Provider } = createContext(defaultContextState);
 
 export class GroupProvider extends Component {
   static propTypes = {
-    children: PropTypes.element.isRequired
-  }
+    children: PropTypes.element.isRequired,
+  };
 
-  setEditing = newEditing => {
+  setEditing = (newEditing) => {
     this.setState(() => {
-      return { editing: newEditing }
-    })
-  }
+      return { editing: newEditing };
+    });
+  };
 
-  setError = newError => {
+  setError = (newError) => {
     this.setState(() => {
-      return { error: newError }
-    })
-  }
+      return { error: newError };
+    });
+  };
 
   state = {
     error: false,
-    editing: '',
+    editing: null,
+
     setEditing: this.setEditing,
-    setError: this.setError
-  }
+    setError: this.setError,
+  };
 
   render() {
-    return  <Provider value={this.state}>{this.props.children}</Provider>
+    return <Provider value={this.state}>{this.props.children}</Provider>;
   }
 }
 
-export const GroupConsumer = Consumer
+export const GroupConsumer = Consumer;

@@ -6,30 +6,30 @@ import { Item } from "./components/Custom/Item";
 
 import { root } from "./main";
 import { Header } from "./components/Custom/Header";
-import { GroupWrapper } from "./components/Custom/Group";
 import { GROUP_TYPES, MODES } from "./constants";
-import { GroupProvider } from "./components/Custom/Provider";
 
 const emit = (name, value) => {
   const event = new CustomEvent(name, { detail: value });
 
   root.dispatchEvent(event);
-}
+};
 
 export function App() {
   const [items, setItems] = useState(JSON.parse(root.dataset["items"] ?? "[]"));
 
-  const [fakeItem, setFakeItem] = useState(null)
+  const [fakeItem, setFakeItem] = useState(null);
 
   const [groups, setGroups] = useState(
     JSON.parse(root.dataset["groups"] ?? "[]")
   );
 
-  const [mode, setMode] = useState(JSON.parse(root.dataset["mode"] ?? '"edit"'));
+  const [mode, setMode] = useState(
+    JSON.parse(root.dataset["mode"] ?? '"edit"')
+  );
 
   const handleItemCreate = (item) => {
-    emit("create:item", item )
-  }
+    emit("create:item", item);
+  };
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const group = groupList[newGroupOrder];
@@ -46,38 +46,46 @@ export function App() {
         : item
     );
 
-    setItems(_items)
+    setItems(_items);
 
-    emit("modify:items", _items)
+    emit("modify:items", _items);
   };
 
   const handleItemResize = (itemId, time, edge) => {
     const _items = items.map((item) => {
+      if (item.id !== itemId) {
+        return item;
+      }
+
       const start = edge === "left" ? time : item.start;
       const end = edge === "left" ? item.end : time;
 
-      return item.id === itemId
-        ? Object.assign({}, item, { start, end })
-        : item;
+      console.log("log - handle resize: ", { start, end });
+
+      return Object.assign({}, item, { start, end });
     });
 
-    setItems(_items)
+    setItems(_items);
 
-    emit("modify:items", _items)
+    emit("modify:items", _items);
   };
 
   const onItemDoubleClick = (e) => {
-    emit("select:item", e)
+    emit("select:item", e);
   };
 
   const onSwapGroup = (source, target) => {
-    const sourceIndex = groups.findIndex((group) => Number(group.id) === Number(source))
+    const sourceIndex = groups.findIndex(
+      (group) => Number(group.id) === Number(source)
+    );
 
-    const targetIndex = groups.findIndex((group) => Number(group.id) === Number(target));
+    const targetIndex = groups.findIndex(
+      (group) => Number(group.id) === Number(target)
+    );
 
     groups[sourceIndex] = groups.splice(targetIndex, 1, groups[sourceIndex])[0];
 
-    emit("modify:groups", groups)
+    emit("modify:groups", groups);
   };
 
   const onChange = (v) => {
@@ -85,42 +93,76 @@ export function App() {
     groups[index].title = v.title;
     groups[index].isError = v.isError;
 
-    emit("modify:groups", groups)
+    emit("modify:groups", groups);
   };
 
   const onCreateItem = (group, time) => {
-    const item = items.find(({ group: _group }) => Number(group) === Number(_group))
-    const _group = groups.find(({ id }) => Number(group) === Number(id))
+    const item = items.find(
+      ({ group: _group }) => Number(group) === Number(_group)
+    );
+    const _group = groups.find(({ id }) => Number(group) === Number(id));
 
-    if (_group?.type === GROUP_TYPES.START || _group?.type === GROUP_TYPES.END) {
-      return
+    if (
+      _group?.type === GROUP_TYPES.START ||
+      _group?.type === GROUP_TYPES.END
+    ) {
+      return;
     }
 
-    if(!item) {
-      emit("create:item", { group, start: time, end: time })
+    if (!item) {
+      emit("create:item", { group, start: time, end: time });
     } else {
-      emit('select:item', item.id)
+      emit("select:item", item.id);
     }
-  }
+  };
 
   const onCreateGroup = () => {
-    emit("create:group", null)
-  }
+    emit("create:group", null);
+  };
 
   const onRemoveGroup = (id) => {
-    emit("remove:group", id)
-  }
+    emit("remove:group", id);
+  };
 
   const groupList = useMemo(() => {
     if (mode !== MODES.EDIT) return groups;
 
     return [
       ...groups,
-      { id: "create-button", title: "工程を追加", type: GROUP_TYPES.ADD_BUTTON },
+      {
+        id: "create-button",
+        title: "工程を追加",
+        type: GROUP_TYPES.ADD_BUTTON,
+      },
     ];
   }, [groups, mode]);
 
-  const itemList = useMemo(() => fakeItem ? [...items, fakeItem]: [...items], [items, fakeItem]);
+  const itemList = useMemo(
+    () => (fakeItem ? [...items, fakeItem] : [...items]),
+    [items, fakeItem]
+  );
+
+  const moveResizeValidator = (action, item, time, resizeEdge) => {
+    const delta = 5 * 24 * 60 * 60 * 1000; // start and end available distance equals 5 day
+
+    // // drag left handler
+    if (resizeEdge === "left") {
+      if (time < item.end - delta) {
+        return time;
+      } else {
+        return item.end - delta;
+      }
+    } else if (resizeEdge === "right") {
+      if (time > item.start + delta) {
+        console.log("return time");
+        return time;
+      } else {
+        return item.start + delta;
+      }
+    }
+
+    return time;
+  };
 
   useEffect(() => {
     const onChangeItems = () => setItems(JSON.parse(root.dataset.items));
@@ -139,35 +181,40 @@ export function App() {
   }, []);
 
   return (
-    <GroupProvider>
-      <Timeline
+    <Timeline
       mode={mode}
-
       sidebarWidth={mode === MODES.VIEW ? 100 : 144}
-
-      defaultTimeStart={new Date(root.dataset["defaultTimeStart"] || "2024-01-01")}
-      defaultTimeEnd={new Date(root.dataset["defaultTimeEnd"] || "2025-01-01")}
+      defaultTimeStart={
+        new Date(
+          root.dataset["defaultTimeStart"] ||
+            `${new Date().getFullYear()}-01-01`
+        )
+      }
+      defaultTimeEnd={
+        new Date(
+          root.dataset["defaultTimeEnd"] ||
+            `${new Date().getFullYear() + 1}-01-01`
+        )
+      }
       groups={groupList}
       items={itemList}
       fakeItem={fakeItem}
       setFakeItem={setFakeItem}
-      
       onItemMove={handleItemMove}
       onItemResize={handleItemResize}
       onItemCreate={handleItemCreate}
-      // onTimeChange={onTimeChange}
       onItemDoubleClick={onItemDoubleClick}
       onCanvasDoubleClick={onCreateItem}
-      
       itemRenderer={Item}
-      groupRenderer={(props) => (
-        <GroupWrapper {...props} onSwapGroup={onSwapGroup} onChange={onChange} onCreateGroup={onCreateGroup} onRemoveGroup={onRemoveGroup}/>
-      )}
+      onSwapGroup={onSwapGroup}
+      onChange={onChange}
+      onCreateGroup={onCreateGroup}
+      onRemoveGroup={onRemoveGroup}
+      moveResizeValidator={moveResizeValidator}
     >
       <TimelineHeaders className="sticky">
         <DateHeader labelFormat="YYYY年M月" intervalRenderer={Header} />
       </TimelineHeaders>
     </Timeline>
-    </GroupProvider>
   );
 }
