@@ -352,9 +352,7 @@ const Group = ({
         {renderGroupContent()}
       </div>
       {editing === id && error && (
-        <div className="error-message">
-          保守の内容は510文字以内に入力してください。
-        </div>
+        <div className="error-message">工程名を入力してください。</div>
       )}
     </div>
   );
