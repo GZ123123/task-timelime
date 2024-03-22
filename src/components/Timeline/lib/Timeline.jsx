@@ -1052,6 +1052,7 @@ class ReactCalendarTimeline extends Component {
                 className={`react-calendar-timeline ${this.props.className}`}
               >
                 {this.renderHeaders()}
+                {/* <div style={{ height: `${height}px` }} className="rct-outer"> */}
                 <div style={{ height: `${height}px` }} className="rct-outer">
                   {sidebarWidth > 0
                     ? this.sidebar(mode, height, groupHeights)
