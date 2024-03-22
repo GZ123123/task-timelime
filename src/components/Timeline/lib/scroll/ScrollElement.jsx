@@ -177,6 +177,8 @@ class ScrollElement extends Component {
       height: `${height + 20}px`, //20px to push the scroll element down off screen...?
       cursor: isDragging ? "ew-resize" : "default",
       position: "relative",
+      // * Remove Scroll Bar
+      overflow: 'hidden'
     };
 
     return (

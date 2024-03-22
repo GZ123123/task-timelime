@@ -60,8 +60,6 @@ export function App() {
       const start = edge === "left" ? time : item.start;
       const end = edge === "left" ? item.end : time;
 
-      console.log("log - handle resize: ", { start, end });
-
       return Object.assign({}, item, { start, end });
     });
 
@@ -143,7 +141,8 @@ export function App() {
   );
 
   const moveResizeValidator = (action, item, time, resizeEdge) => {
-    const delta = 5 * 24 * 60 * 60 * 1000; // start and end available distance equals 5 day
+    // const delta = 5 * 24 * 60 * 60 * 1000; // start and end available distance equals 5 day
+    const delta = 0; // start and end available distance equals 5 day
 
     // // drag left handler
     if (resizeEdge === "left") {
@@ -154,7 +153,6 @@ export function App() {
       }
     } else if (resizeEdge === "right") {
       if (time > item.start + delta) {
-        console.log("return time");
         return time;
       } else {
         return item.start + delta;

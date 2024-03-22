@@ -1052,8 +1052,7 @@ class ReactCalendarTimeline extends Component {
                 className={`react-calendar-timeline ${this.props.className}`}
               >
                 {this.renderHeaders()}
-                {/* <div style={{ height: `${height}px` }} className="rct-outer"> */}
-                <div style={{ height: `${height}px` }} className="rct-outer">
+                <div className="rct-outer">
                   {sidebarWidth > 0
                     ? this.sidebar(mode, height, groupHeights)
                     : null}
@@ -1100,9 +1099,6 @@ class ReactCalendarTimeline extends Component {
                       )}
                     </MarkerCanvas>
                   </ScrollElement>
-                  {/* {rightSidebarWidth > 0
-                  ? this.rightSidebar(height, groupHeights)
-                  : null} */}
                 </div>
               </div>
             </ScrollElementProvider>
