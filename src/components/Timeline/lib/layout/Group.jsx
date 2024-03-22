@@ -154,6 +154,11 @@ const Group = ({
       setError(false);
     }
   };
+
+  const handleMouseClick = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+  }
   // #endregion
 
   // #region Effect
@@ -329,6 +334,7 @@ const Group = ({
             {isProcess && (
               <div
                 className="drag-handler"
+                onClick={handleMouseClick}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onDragOver={onDragOver}
