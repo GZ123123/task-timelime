@@ -14,8 +14,26 @@ const emit = (name, value) => {
   root.dispatchEvent(event);
 };
 
+const getItems = () => {
+  const items = JSON.parse(root.dataset["items"] ?? "[]")
+
+  return items.map((item) => {
+    if((item.type === GROUP_TYPES.START || item.type === GROUP_TYPES.END) && item.start) {
+      // item.end 
+      const startDate = new Date(item.start)
+
+      item.start = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1).getTime()
+      item.end = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 1).getTime()
+    }
+
+    console.log('log - item: ', item)
+
+    return item
+  })
+}
+
 export function App() {
-  const [items, setItems] = useState(JSON.parse(root.dataset["items"] ?? "[]"));
+  const [items, setItems] = useState(getItems());
 
   const [fakeItem, setFakeItem] = useState(null);
 

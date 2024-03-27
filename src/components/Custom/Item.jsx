@@ -1,6 +1,6 @@
 import types from "prop-types";
 import { GROUP_TYPES } from "../../constants";
-import clsx from "clsx";
+// import clsx from "clsx";
 
 export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
@@ -16,20 +16,16 @@ export const Item = ({ item, itemContext, getItemProps, getResizeProps }) => {
     return (
       <div
         {...props}
-        className={clsx(props.className, "start")}
         style={{
           ...style,
           background: "transparent",
           color: item.color,
           borderRadius: "8px",
-          width: "25px",
-          height: "25px",
-          overflow: "visible",
-          pointerEvents: "none",
+          display: "flex",
+          justifyContent: "center",
         }}
       >
         <svg
-          style={{ transform: "translateX(-50%)" }}
           width="18"
           height="18"
           viewBox="0 0 18 18"

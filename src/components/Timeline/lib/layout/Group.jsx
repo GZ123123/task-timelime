@@ -296,7 +296,7 @@ const Group = ({
                 type="text"
                 value={title}
                 onChange={handleTitleChange}
-                onKeyDown={handleKeyDown}
+                onKeyPress={handleKeyDown}
               />
 
               <div onClick={handleUpdateGroup}>
